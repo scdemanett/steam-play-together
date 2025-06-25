@@ -270,7 +270,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                   <div className="text-center">
                     <h3 className="text-lg font-medium mb-2">Link Your Steam Account</h3>
                     <p className="text-sm text-gray-500 mb-4">
-                      Choose how you'd like to connect your Steam account
+                      Choose how you&apos;d like to connect your Steam account
                     </p>
                   </div>
 

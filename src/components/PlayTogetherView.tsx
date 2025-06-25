@@ -169,7 +169,7 @@ export function PlayTogetherView() {
   const handleLaunchGame = (appId: number, gameName: string) => {
     launchSteamGame(appId);
     toast.success(`Launching ${gameName}...`, {
-      description: 'If Steam doesn\'t open, you may need to allow the browser to open Steam links.'
+      description: `If Steam doesn't open, you may need to allow the browser to open Steam links.`
     });
   };
 
@@ -268,7 +268,7 @@ export function PlayTogetherView() {
             <CardDescription>
               Select which friends you want to compare games with, then click &quot;Add Selected&quot;
               <br />
-              <span className="text-xs text-muted-foreground">Friends with Private badges have profiles that won't contribute to common games</span>
+              <span className="text-xs text-muted-foreground">Friends with Private badges have profiles that won&apos;t contribute to common games</span>
             </CardDescription>
           </CardHeader>
           
@@ -463,7 +463,7 @@ export function PlayTogetherView() {
                       )}
                       {currentPrivateFriends.length > 0 && (
                         <span className={`${currentPublicFriends.length > 0 ? 'block mt-1' : ''} text-orange-600 dark:text-orange-400`}>
-                                                     {currentPrivateFriends.length} friend{currentPrivateFriends.length !== 1 ? 's' : ''} couldn't be included (private profile{currentPrivateFriends.length !== 1 ? 's' : ''}): {currentPrivateFriends.map(id => friends.find(f => f.steamId === id)?.name || id).join(', ')}
+                                                     {`${currentPrivateFriends.length} friend${currentPrivateFriends.length !== 1 ? 's' : ''} couldn't be included (private profile${currentPrivateFriends.length !== 1 ? 's' : ''}): ${currentPrivateFriends.map(id => friends.find(f => f.steamId === id)?.name || id).join(', ')}`}
                         </span>
                       )}
                     </div>
@@ -548,7 +548,7 @@ export function PlayTogetherView() {
               <p className="text-muted-foreground">
                 {friends.length === 0
                   ? "Add friends to find games you can play together"
-                  : "Click 'Find Common Games' to see what you can play together"}
+                  : `Click "Find Common Games" to see what you can play together`}
               </p>
             </div>
           )}
