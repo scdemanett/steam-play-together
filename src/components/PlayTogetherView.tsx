@@ -572,7 +572,7 @@ export function PlayTogetherView() {
               {/* Row 1: Title */}
               <div className="flex items-center gap-2">
                 <Play className="h-5 w-5" />
-                <span>Games You Can Play Together</span>
+                <span>Steam Games You Can Play Together</span>
               </div>
               
               {/* Row 2: Timestamp */}
