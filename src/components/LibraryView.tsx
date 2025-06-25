@@ -260,7 +260,7 @@ export function LibraryView() {
           </CardTitle>
           <CardDescription>
             {gameCount > 0 && (
-              <span>Total games: {gameCount} | Filtered: {paginationData.totalItems} | Showing: {paginationData.currentPageGames.length}</span>
+              <span>Total: {gameCount} | Filtered: {paginationData.totalItems} | Showing: {paginationData.currentPageGames.length}</span>
             )}
             {lastUpdated && (
               <span className="ml-4 text-xs">

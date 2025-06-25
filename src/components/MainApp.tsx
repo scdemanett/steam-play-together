@@ -21,32 +21,34 @@ export function MainApp() {
         {/* Header */}
         <header className="border-b bg-card">
           <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div className="flex items-center gap-2">
                 <span className="text-2xl">🎮</span>
                 <h1 className="text-xl font-bold">Steam Play Together</h1>
               </div>
               
-              <div className="flex items-center gap-3">
-                {settings?.steamAvatar && (
-                  <Image
-                    src={settings.steamAvatar}
-                    alt="Steam Avatar"
-                    width={32}
-                    height={32}
-                    className="rounded-full"
-                    unoptimized
-                  />
-                )}
-                <div className="flex flex-col items-end">
-                  {settings?.steamUsername && (
-                    <span className="text-sm font-medium">
-                      {settings.steamUsername}
-                    </span>
+              <div className="flex items-center justify-between lg:justify-end gap-3">
+                <div className="flex items-center gap-3">
+                  {settings?.steamAvatar && (
+                    <Image
+                      src={settings.steamAvatar}
+                      alt="Steam Avatar"
+                      width={32}
+                      height={32}
+                      className="rounded-full"
+                      unoptimized
+                    />
                   )}
-                  <span className="text-xs text-muted-foreground">
-                    ID: {settings?.steamId}
-                  </span>
+                  <div className="flex flex-col">
+                    {settings?.steamUsername && (
+                      <span className="text-sm font-medium">
+                        {settings.steamUsername}
+                      </span>
+                    )}
+                    <span className="text-xs text-muted-foreground">
+                      ID: {settings?.steamId}
+                    </span>
+                  </div>
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => setShowSettings(false)}>
                   <ArrowLeft className="h-4 w-4" />
@@ -79,32 +81,34 @@ export function MainApp() {
       {/* Header */}
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex items-center gap-2">
               <span className="text-2xl">🎮</span>
               <h1 className="text-xl font-bold">Steam Play Together</h1>
             </div>
             
-            <div className="flex items-center gap-3">
-              {settings?.steamAvatar && (
-                <Image
-                  src={settings.steamAvatar}
-                  alt="Steam Avatar"
-                  width={32}
-                  height={32}
-                  className="rounded-full"
-                  unoptimized
-                />
-              )}
-              <div className="flex flex-col items-end">
-                {settings?.steamUsername && (
-                  <span className="text-sm font-medium">
-                    {settings.steamUsername}
-                  </span>
+            <div className="flex items-center justify-between lg:justify-end gap-3">
+              <div className="flex items-center gap-3">
+                {settings?.steamAvatar && (
+                  <Image
+                    src={settings.steamAvatar}
+                    alt="Steam Avatar"
+                    width={32}
+                    height={32}
+                    className="rounded-full"
+                    unoptimized
+                  />
                 )}
-                <span className="text-xs text-muted-foreground">
-                  ID: {settings?.steamId}
-                </span>
+                <div className="flex flex-col">
+                  {settings?.steamUsername && (
+                    <span className="text-sm font-medium">
+                      {settings.steamUsername}
+                    </span>
+                  )}
+                  <span className="text-xs text-muted-foreground">
+                    ID: {settings?.steamId}
+                  </span>
+                </div>
               </div>
               <Button variant="ghost" size="sm" onClick={() => setShowSettings(true)}>
                 <Settings className="h-4 w-4" />
@@ -118,11 +122,11 @@ export function MainApp() {
       <main className="container mx-auto px-4 py-6">
         <Tabs value={currentTab} onValueChange={setCurrentTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="library" className="flex items-center gap-2">
+            <TabsTrigger value="library" className="flex items-center gap-2 text-sm lg:text-base">
               <Library className="h-4 w-4" />
               Games Library
             </TabsTrigger>
-            <TabsTrigger value="play-together" className="flex items-center gap-2">
+            <TabsTrigger value="play-together" className="flex items-center gap-2 text-sm lg:text-base">
               <Users className="h-4 w-4" />
               Play Together
             </TabsTrigger>
