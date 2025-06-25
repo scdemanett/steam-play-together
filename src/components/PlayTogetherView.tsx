@@ -558,7 +558,7 @@ export function PlayTogetherView() {
             {/* Desktop layout - title with timestamp inline */}
             <div className="hidden lg:flex lg:items-center lg:gap-2">
               <Play className="h-5 w-5" />
-              <span>Games You Can Play Together</span>
+              <span>Steam Games You Can Play Together</span>
               {lastCommonGamesUpdate && (
                 <div className="flex items-center gap-1 text-sm text-muted-foreground font-normal">
                   <Clock className="h-3 w-3" />
