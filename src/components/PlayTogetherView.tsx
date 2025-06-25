@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, RefreshCw, UserPlus, Play, Users, Trash2, ExternalLink, Clock } from 'lucide-react';
+import { Search, RefreshCw, UserPlus, Play, Users, Trash2, Clock, ListCheck, ListRestart } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useFriends } from '@/contexts/FriendsContext';
 import { useSettings } from '@/contexts/SettingsContext';
@@ -47,9 +47,14 @@ export function PlayTogetherView() {
   };
 
   // Filter Steam friends to exclude those already in the main friends list
-  const availableSteamFriends = steamFriends.filter(steamFriend => 
-    !friends.some(friend => friend.steamId === steamFriend.steamId)
-  );
+  const availableSteamFriends = steamFriends
+    .filter(steamFriend => 
+      !friends.some(friend => friend.steamId === steamFriend.steamId)
+    )
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  // Sort friends alphabetically by name
+  const sortedFriends = [...friends].sort((a, b) => a.name.localeCompare(b.name));
 
   // Clear selected friends that are no longer available
   useEffect(() => {
@@ -225,7 +230,7 @@ export function PlayTogetherView() {
             {isLoadingSteamFriends ? (
               <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
             ) : (
-              <ExternalLink className="h-4 w-4 mr-2" />
+              <ListRestart className="h-4 w-4 mr-2" />
             )}
             Load Friends from Steam
           </Button>
@@ -238,7 +243,7 @@ export function PlayTogetherView() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <ExternalLink className="h-5 w-5" />
+                <ListCheck className="h-5 w-5" />
                 <span>Select Steam Friends ({availableSteamFriends.length})</span>
                 {lastSteamFriendsUpdate && (
                   <div className="flex items-center gap-1 text-sm text-muted-foreground font-normal">
@@ -350,7 +355,7 @@ export function PlayTogetherView() {
           
           <CardContent>
             <div className="space-y-2">
-              {friends.map((friend) => (
+              {sortedFriends.map((friend) => (
                 <div key={friend.steamId} className="flex items-center justify-between p-3 border rounded-lg">
                   <div className="flex items-center gap-3">
                     {friend.avatar && (
