@@ -21,6 +21,8 @@ interface CachedFriendsData {
 interface CachedCommonGamesData {
   commonGames: SteamGame[];
   friendIds: string[];
+  publicFriends: string[];
+  privateFriends: string[];
   timestamp: number;
   steamId: string;
 }
@@ -29,6 +31,8 @@ interface FriendsContextType {
   friends: Friend[];
   steamFriends: Friend[];
   commonGames: SteamGame[];
+  publicFriends: string[];
+  privateFriends: string[];
   isLoadingFriends: boolean;
   isLoadingSteamFriends: boolean;
   isLoadingCommon: boolean;
@@ -61,6 +65,8 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [steamFriends, setSteamFriends] = useState<Friend[]>([]);
   const [commonGames, setCommonGames] = useState<SteamGame[]>([]);
+  const [publicFriends, setPublicFriends] = useState<string[]>([]);
+  const [privateFriends, setPrivateFriends] = useState<string[]>([]);
   const [isLoadingFriends] = useState(false);
   const [isLoadingSteamFriends, setIsLoadingSteamFriends] = useState(false);
   const [isLoadingCommon, setIsLoadingCommon] = useState(false);
@@ -109,11 +115,15 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
       
       if (!isExpired && !isDifferentUser) {
         setCommonGames(cachedData.commonGames);
+        setPublicFriends(cachedData.publicFriends || []);
+        setPrivateFriends(cachedData.privateFriends || []);
         setLastCommonGamesUpdate(new Date(cachedData.timestamp));
         setCommonGamesLoaded(true);
       } else {
         localStorage.removeItem(COMMON_GAMES_CACHE_KEY);
         setCommonGames([]);
+        setPublicFriends([]);
+        setPrivateFriends([]);
         setCommonGamesLoaded(false);
         setLastCommonGamesUpdate(null);
       }
@@ -144,13 +154,15 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const saveCommonGamesToCache = (gamesData: SteamGame[], friendIds: string[]) => {
+  const saveCommonGamesToCache = (gamesData: SteamGame[], friendIds: string[], publicFriendIds: string[], privateFriendIds: string[]) => {
     if (!settings?.steamId) return;
 
     try {
       const cacheData: CachedCommonGamesData = {
         commonGames: gamesData,
         friendIds,
+        publicFriends: publicFriendIds,
+        privateFriends: privateFriendIds,
         timestamp: Date.now(),
         steamId: settings.steamId,
       };
@@ -200,8 +212,11 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
     saveFriendsToCache(updatedFriends);
     setLastFriendsUpdate(new Date());
     
-    // Clear common games cache since friends list changed
-    clearCommonGamesCache();
+    // Only clear common games, keep visibility badges for existing friends
+    setCommonGames([]);
+    setCommonGamesLoaded(false);
+    setLastCommonGamesUpdate(null);
+    localStorage.removeItem(COMMON_GAMES_CACHE_KEY);
   };
 
   const removeFriend = (steamId: string) => {
@@ -210,8 +225,14 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
     saveFriendsToCache(updatedFriends);
     setLastFriendsUpdate(new Date());
     
-    // Clear common games cache since friends list changed
-    clearCommonGamesCache();
+    // Keep visibility data for removed friends so we remember their profile status
+    // when they appear in Steam friends selection later
+    
+    // Clear common games since they need to be recalculated
+    setCommonGames([]);
+    setCommonGamesLoaded(false);
+    setLastCommonGamesUpdate(null);
+    localStorage.removeItem(COMMON_GAMES_CACHE_KEY);
   };
 
   const loadSteamFriends = async () => {
@@ -266,8 +287,11 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
     setLastFriendsUpdate(new Date());
     setFriendsLoaded(true);
     
-    // Clear common games cache since friends list changed
-    clearCommonGamesCache();
+    // Only clear common games, keep visibility badges for existing friends
+    setCommonGames([]);
+    setCommonGamesLoaded(false);
+    setLastCommonGamesUpdate(null);
+    localStorage.removeItem(COMMON_GAMES_CACHE_KEY);
   };
 
   const clearSteamFriends = () => {
@@ -297,17 +321,35 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
         settings.steamApiKey
       );
       
-      const { commonGames: commonGamesData, publicFriends, privateFriends, message } = response;
+      const { commonGames: commonGamesData, publicFriends: publicFriendIds, privateFriends: privateFriendIds, message } = response;
       
       setCommonGames(commonGamesData);
-      saveCommonGamesToCache(commonGamesData, friendSteamIds);
+      
+      // Merge new visibility data with existing data to preserve info about friends not in current search
+      setPublicFriends(prev => {
+        // Remove current search friends from old data, then add new data
+        const nonSearchFriends = prev.filter(id => !friendSteamIds.includes(id));
+        return [...nonSearchFriends, ...publicFriendIds];
+      });
+      
+      setPrivateFriends(prev => {
+        // Remove current search friends from old data, then add new data
+        const nonSearchFriends = prev.filter(id => !friendSteamIds.includes(id));
+        return [...nonSearchFriends, ...privateFriendIds];
+      });
+      
+      // Update cache with merged data
+      const mergedPublicFriends = publicFriends.filter(id => !friendSteamIds.includes(id)).concat(publicFriendIds);
+      const mergedPrivateFriends = privateFriends.filter(id => !friendSteamIds.includes(id)).concat(privateFriendIds);
+      saveCommonGamesToCache(commonGamesData, friendSteamIds, mergedPublicFriends, mergedPrivateFriends);
+      
       setLastCommonGamesUpdate(new Date());
       setCommonGamesLoaded(true);
       
       return {
         gamesCount: commonGamesData.length,
-        publicFriendsCount: publicFriends.length,
-        privateFriendsCount: privateFriends.length,
+        publicFriendsCount: publicFriendIds.length,
+        privateFriendsCount: privateFriendIds.length,
         message
       };
     } finally {
@@ -330,6 +372,8 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
   const clearCommonGamesCache = () => {
     localStorage.removeItem(COMMON_GAMES_CACHE_KEY);
     setCommonGames([]);
+    setPublicFriends([]);
+    setPrivateFriends([]);
     setCommonGamesLoaded(false);
     setLastCommonGamesUpdate(null);
   };
@@ -340,6 +384,8 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
           friends,
           steamFriends,
           commonGames,
+          publicFriends,
+          privateFriends,
           isLoadingFriends,
           isLoadingSteamFriends,
           isLoadingCommon,

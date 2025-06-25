@@ -6,8 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, RefreshCw, UserPlus, Play, Users, Trash2, Clock, ListCheck, ListRestart } from 'lucide-react';
+import { Search, RefreshCw, UserPlus, Play, Users, Trash2, Clock, ListCheck, ListRestart, Eye, EyeOff } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
 import { useFriends } from '@/contexts/FriendsContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import { getSteamIconUrl, launchSteamGame } from '@/lib/steam-api';
@@ -21,6 +22,8 @@ export function PlayTogetherView() {
     friends,
     steamFriends,
     commonGames,
+    publicFriends,
+    privateFriends,
     isLoadingFriends,
     isLoadingSteamFriends,
     isLoadingCommon,
@@ -160,20 +163,13 @@ export function PlayTogetherView() {
     const friendToRemove = friends.find(f => f.steamId === steamId);
     removeFriend(steamId);
     toast.success(`${friendToRemove?.name || 'Friend'} removed`);
-    
-    // If we still have friends, refresh common games
-    if (friends.length > 1) {
-      const remainingFriends = friends.filter(f => f.steamId !== steamId);
-      findCommonGames(remainingFriends).catch(error => {
-        console.error('Error refreshing common games after friend removal:', error);
-      });
-    }
+    // Note: The FriendsContext automatically clears common games cache when friends are removed
   };
 
   const handleLaunchGame = (appId: number, gameName: string) => {
     launchSteamGame(appId);
     toast.success(`Launching ${gameName}...`, {
-      description: 'If Steam doesn&apos;t open, you may need to allow the browser to open Steam links.'
+      description: 'If Steam doesn\'t open, you may need to allow the browser to open Steam links.'
     });
   };
 
@@ -271,37 +267,59 @@ export function PlayTogetherView() {
             </CardTitle>
             <CardDescription>
               Select which friends you want to compare games with, then click &quot;Add Selected&quot;
+              <br />
+              <span className="text-xs text-muted-foreground">Friends with Private badges have profiles that won't contribute to common games</span>
             </CardDescription>
           </CardHeader>
           
           <CardContent>
             <div className="space-y-2 max-h-60 overflow-y-auto">
-              {availableSteamFriends.map((friend) => (
-                <div 
-                  key={friend.steamId} 
-                  className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-                  onClick={() => handleSteamFriendToggle(friend.steamId)}
-                >
-                  <Checkbox
-                    checked={selectedSteamFriends.has(friend.steamId)}
-                    onCheckedChange={() => handleSteamFriendToggle(friend.steamId)}
-                  />
-                  {friend.avatar && (
-                    <Image 
-                      src={friend.avatar} 
-                      alt={`${friend.name} avatar`} 
-                      width={32}
-                      height={32}
-                      className="rounded-full"
-                      unoptimized
+              {availableSteamFriends.map((friend) => {
+                const isPublic = publicFriends.includes(friend.steamId);
+                const isPrivate = privateFriends.includes(friend.steamId);
+                const hasProfileData = isPublic || isPrivate;
+                
+                return (
+                  <div 
+                    key={friend.steamId} 
+                    className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors ${isPrivate ? 'opacity-60' : ''}`}
+                    onClick={() => handleSteamFriendToggle(friend.steamId)}
+                  >
+                    <Checkbox
+                      checked={selectedSteamFriends.has(friend.steamId)}
+                      onCheckedChange={() => handleSteamFriendToggle(friend.steamId)}
                     />
-                  )}
-                  <div className="flex-1">
-                    <div className="font-medium">{friend.name}</div>
-                    <div className="text-sm text-muted-foreground">{friend.steamId}</div>
+                    {friend.avatar && (
+                      <Image 
+                        src={friend.avatar} 
+                        alt={`${friend.name} avatar`} 
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                        unoptimized
+                      />
+                    )}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <div className="font-medium">{friend.name}</div>
+                        {hasProfileData && (
+                          <Badge 
+                            variant={isPublic ? "default" : "secondary"} 
+                            className="text-xs"
+                          >
+                            {isPublic ? (
+                              <><Eye className="h-3 w-3 mr-1" />Public</>
+                            ) : (
+                              <><EyeOff className="h-3 w-3 mr-1" />Private</>
+                            )}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-sm text-muted-foreground">{friend.steamId}</div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
@@ -355,33 +373,53 @@ export function PlayTogetherView() {
           
           <CardContent>
             <div className="space-y-2">
-              {sortedFriends.map((friend) => (
-                <div key={friend.steamId} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    {friend.avatar && (
-                      <Image 
-                        src={friend.avatar} 
-                        alt={`${friend.name} avatar`} 
-                        width={32}
-                        height={32}
-                        className="rounded-full"
-                        unoptimized
-                      />
-                    )}
-                    <div>
-                      <div className="font-medium">{friend.name}</div>
-                      <div className="text-sm text-muted-foreground">{friend.steamId}</div>
+              {sortedFriends.map((friend) => {
+                const isPublic = publicFriends.includes(friend.steamId);
+                const isPrivate = privateFriends.includes(friend.steamId);
+                const hasProfileData = isPublic || isPrivate;
+                
+                return (
+                  <div key={friend.steamId} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      {friend.avatar && (
+                        <Image 
+                          src={friend.avatar} 
+                          alt={`${friend.name} avatar`} 
+                          width={32}
+                          height={32}
+                          className="rounded-full"
+                          unoptimized
+                        />
+                      )}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <div className="font-medium">{friend.name}</div>
+                          {hasProfileData && (
+                            <Badge 
+                              variant={isPublic ? "default" : "secondary"} 
+                              className="text-xs"
+                            >
+                              {isPublic ? (
+                                <><Eye className="h-3 w-3 mr-1" />Public</>
+                              ) : (
+                                <><EyeOff className="h-3 w-3 mr-1" />Private</>
+                              )}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="text-sm text-muted-foreground">{friend.steamId}</div>
+                      </div>
                     </div>
+                    <Button
+                      onClick={() => handleRemoveFriend(friend.steamId)}
+                      variant="ghost"
+                      size="sm"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button
-                    onClick={() => handleRemoveFriend(friend.steamId)}
-                    variant="ghost"
-                    size="sm"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
@@ -404,7 +442,34 @@ export function PlayTogetherView() {
           </CardTitle>
           <CardDescription>
             {commonGames.length > 0 && (
-              <span>Found {commonGames.length} common games | Showing: {filteredGames.length}</span>
+              <div className="space-y-1">
+                <span>Found {commonGames.length} common games | Showing: {filteredGames.length}</span>
+                {(() => {
+                  // Only show visibility info for friends that are currently in the comparison list
+                  const currentFriendIds = friends.map(f => f.steamId);
+                  const currentPublicFriends = publicFriends.filter(id => currentFriendIds.includes(id));
+                  const currentPrivateFriends = privateFriends.filter(id => currentFriendIds.includes(id));
+                  
+                  if (currentPublicFriends.length === 0 && currentPrivateFriends.length === 0) {
+                    return null;
+                  }
+                  
+                  return (
+                    <div className="text-sm">
+                      {currentPublicFriends.length > 0 && (
+                        <span className="text-green-600 dark:text-green-400">
+                          Games found with {currentPublicFriends.length} friend{currentPublicFriends.length !== 1 ? 's' : ''}: {currentPublicFriends.map(id => friends.find(f => f.steamId === id)?.name || id).join(', ')}
+                        </span>
+                      )}
+                      {currentPrivateFriends.length > 0 && (
+                        <span className={`${currentPublicFriends.length > 0 ? 'block mt-1' : ''} text-orange-600 dark:text-orange-400`}>
+                                                     {currentPrivateFriends.length} friend{currentPrivateFriends.length !== 1 ? 's' : ''} couldn't be included (private profile{currentPrivateFriends.length !== 1 ? 's' : ''}): {currentPrivateFriends.map(id => friends.find(f => f.steamId === id)?.name || id).join(', ')}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
             )}
             {lastCommonGamesUpdate && (
               <span className="ml-4 text-xs">
@@ -483,7 +548,7 @@ export function PlayTogetherView() {
               <p className="text-muted-foreground">
                 {friends.length === 0
                   ? "Add friends to find games you can play together"
-                  : "Click &apos;Find Common Games&apos; to see what you can play together"}
+                  : "Click 'Find Common Games' to see what you can play together"}
               </p>
             </div>
           )}
