@@ -145,55 +145,92 @@ export function LibraryView() {
     <div className="space-y-6">
       <Card>
         <CardHeader className="space-y-3">
-          {/* Row 1: Card title with time - responsive layout */}
-          <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-center gap-2">
-              <CardTitle>Steam Games Library</CardTitle>
+          <CardTitle className="space-y-2">
+            {/* Desktop layout - title with timestamp and buttons on same row */}
+            <div className="hidden lg:flex lg:items-center lg:justify-between">
+              <div className="flex items-center gap-2">
+                <span>Steam Games Library</span>
+                {lastUpdated && (
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground font-normal">
+                    <Clock className="h-3 w-3" />
+                    {new Date(lastUpdated).toLocaleTimeString()}
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex gap-2">
+                <Button
+                  onClick={resetTableView}
+                  variant="outline"
+                  size="sm"
+                >
+                  Reset View
+                </Button>
+                <Button
+                  onClick={refreshLibrary}
+                  disabled={isLoading}
+                  variant="outline"
+                  size="sm"
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+              </div>
+            </div>
+            
+            {/* Mobile layout - title, timestamp, then buttons in separate rows */}
+            <div className="lg:hidden space-y-2">
+              {/* Row 1: Title */}
+              <div>
+                <span>Steam Games Library</span>
+              </div>
+              
+              {/* Row 2: Timestamp */}
               {lastUpdated && (
                 <div className="flex items-center gap-1 text-sm text-muted-foreground font-normal">
                   <Clock className="h-3 w-3" />
                   {new Date(lastUpdated).toLocaleTimeString()}
                 </div>
               )}
+              
+              {/* Row 3: Buttons */}
+              <div className="flex gap-2">
+                <Button
+                  onClick={resetTableView}
+                  variant="outline"
+                  size="sm"
+                >
+                  Reset View
+                </Button>
+                <Button
+                  onClick={refreshLibrary}
+                  disabled={isLoading}
+                  variant="outline"
+                  size="sm"
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+              </div>
             </div>
-            
-            {/* Row 2: Reset and Refresh buttons - inline on large screens */}
-            <div className="flex gap-2">
-              <Button
-                onClick={resetTableView}
-                variant="outline"
-                size="sm"
-              >
-                Reset View
-              </Button>
-              <Button
-                onClick={refreshLibrary}
-                disabled={isLoading}
-                variant="outline"
-                size="sm"
-              >
-                <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                Refresh
-              </Button>
-            </div>
-          </div>
+          </CardTitle>
           
-          {/* Rows 3 & 4: Stats and cached data - responsive layout */}
-          <div className="flex flex-col gap-1 lg:flex-row lg:items-center lg:gap-4">
-            {/* Row 3: Total, filtered, showing line */}
+          {/* Stats and cached data */}
+          <CardDescription className="space-y-1">
+            {/* Total, filtered, showing line */}
             {gameCount > 0 && (
               <div className="text-sm text-muted-foreground">
                 Total: {gameCount} | Filtered: {paginationData.totalItems} | Showing: {paginationData.currentPageGames.length}
               </div>
             )}
             
-            {/* Row 4: Cached data line */}
+            {/* Cached data line */}
             {lastUpdated && (
               <div className="text-xs text-muted-foreground">
                 Cached data • Last updated: {lastUpdated.toLocaleString()}
               </div>
             )}
-          </div>
+          </CardDescription>
         </CardHeader>
         
         <CardContent>

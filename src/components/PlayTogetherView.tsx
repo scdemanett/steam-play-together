@@ -237,32 +237,71 @@ export function PlayTogetherView() {
       {steamFriendsLoaded && availableSteamFriends.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <ListCheck className="h-5 w-5" />
-                <span>Select Steam Friends ({availableSteamFriends.length})</span>
+            <CardTitle className="space-y-2">
+              {/* Desktop layout - title with timestamp and buttons on same row */}
+              <div className="hidden lg:flex lg:items-center lg:justify-between">
+                <div className="flex items-center gap-2">
+                  <ListCheck className="h-5 w-5" />
+                  <span>Select Steam Friends ({availableSteamFriends.length})</span>
+                  {lastSteamFriendsUpdate && (
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground font-normal">
+                      <Clock className="h-3 w-3" />
+                      {lastSteamFriendsUpdate.toLocaleTimeString()}
+                    </div>
+                  )}
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleSelectAllSteamFriends}
+                    variant="outline"
+                    size="sm"
+                  >
+                    {selectedSteamFriends.size === availableSteamFriends.length ? 'Unselect All' : 'Select All'}
+                  </Button>
+                  <Button
+                    onClick={handleAddSelectedFriends}
+                    disabled={selectedSteamFriends.size === 0}
+                    size="sm"
+                  >
+                    Add Selected ({selectedSteamFriends.size})
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Mobile layout - title, timestamp, then buttons in separate rows */}
+              <div className="lg:hidden space-y-2">
+                {/* Row 1: Title */}
+                <div className="flex items-center gap-2">
+                  <ListCheck className="h-5 w-5" />
+                  <span>Select Steam Friends ({availableSteamFriends.length})</span>
+                </div>
+                
+                {/* Row 2: Timestamp */}
                 {lastSteamFriendsUpdate && (
                   <div className="flex items-center gap-1 text-sm text-muted-foreground font-normal">
                     <Clock className="h-3 w-3" />
                     {lastSteamFriendsUpdate.toLocaleTimeString()}
                   </div>
                 )}
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleSelectAllSteamFriends}
-                  variant="outline"
-                  size="sm"
-                >
-                  {selectedSteamFriends.size === availableSteamFriends.length ? 'Unselect All' : 'Select All'}
-                </Button>
-                <Button
-                  onClick={handleAddSelectedFriends}
-                  disabled={selectedSteamFriends.size === 0}
-                  size="sm"
-                >
-                  Add Selected ({selectedSteamFriends.size})
-                </Button>
+                
+                {/* Row 3: Buttons */}
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleSelectAllSteamFriends}
+                    variant="outline"
+                    size="sm"
+                  >
+                    {selectedSteamFriends.size === availableSteamFriends.length ? 'Unselect All' : 'Select All'}
+                  </Button>
+                  <Button
+                    onClick={handleAddSelectedFriends}
+                    disabled={selectedSteamFriends.size === 0}
+                    size="sm"
+                  >
+                    Add Selected ({selectedSteamFriends.size})
+                  </Button>
+                </div>
               </div>
             </CardTitle>
             <CardDescription>
@@ -282,40 +321,60 @@ export function PlayTogetherView() {
                 return (
                   <div 
                     key={friend.steamId} 
-                    className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors ${isPrivate ? 'opacity-60' : ''}`}
+                    className={`p-3 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors ${isPrivate ? 'opacity-60' : ''}`}
                     onClick={() => handleSteamFriendToggle(friend.steamId)}
                   >
-                    <Checkbox
-                      checked={selectedSteamFriends.has(friend.steamId)}
-                      onCheckedChange={() => handleSteamFriendToggle(friend.steamId)}
-                    />
-                    {friend.avatar && (
-                      <Image 
-                        src={friend.avatar} 
-                        alt={`${friend.name} avatar`} 
-                        width={32}
-                        height={32}
-                        className="rounded-full"
-                        unoptimized
+                    {/* Main content row */}
+                    <div className="flex items-center gap-3">
+                      <Checkbox
+                        checked={selectedSteamFriends.has(friend.steamId)}
+                        onCheckedChange={() => handleSteamFriendToggle(friend.steamId)}
                       />
-                    )}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <div className="font-medium">{friend.name}</div>
+                      {friend.avatar && (
+                        <Image 
+                          src={friend.avatar} 
+                          alt={`${friend.name} avatar`} 
+                          width={32}
+                          height={32}
+                          className="rounded-full flex-shrink-0"
+                          unoptimized
+                        />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 lg:justify-between">
+                          <div className="font-medium truncate">{friend.name}</div>
+                          {/* Desktop badge */}
+                          {hasProfileData && (
+                            <Badge 
+                              variant={isPublic ? "default" : "secondary"} 
+                              className="text-xs hidden lg:inline-flex"
+                            >
+                              {isPublic ? (
+                                <><Eye className="h-3 w-3 mr-1" />Public</>
+                              ) : (
+                                <><EyeOff className="h-3 w-3 mr-1" />Private</>
+                              )}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="text-sm text-muted-foreground truncate">{friend.steamId}</div>
+                        
+                        {/* Mobile badge */}
                         {hasProfileData && (
-                          <Badge 
-                            variant={isPublic ? "default" : "secondary"} 
-                            className="text-xs"
-                          >
-                            {isPublic ? (
-                              <><Eye className="h-3 w-3 mr-1" />Public</>
-                            ) : (
-                              <><EyeOff className="h-3 w-3 mr-1" />Private</>
-                            )}
-                          </Badge>
+                          <div className="mt-1 lg:hidden">
+                            <Badge 
+                              variant={isPublic ? "default" : "secondary"} 
+                              className="text-xs"
+                            >
+                              {isPublic ? (
+                                <><Eye className="h-3 w-3 mr-1" />Public</>
+                              ) : (
+                                <><EyeOff className="h-3 w-3 mr-1" />Private</>
+                              )}
+                            </Badge>
+                          </div>
                         )}
                       </div>
-                      <div className="text-sm text-muted-foreground">{friend.steamId}</div>
                     </div>
                   </div>
                 );
@@ -340,33 +399,70 @@ export function PlayTogetherView() {
       {friends.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                <span>Friends ({friends.length})</span>
+            <CardTitle className="space-y-2">
+              {/* Desktop layout - title with timestamp and button on same row */}
+              <div className="hidden lg:flex lg:items-center lg:justify-between">
+                <div className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  <span>Friends ({friends.length})</span>
+                  {lastFriendsUpdate && (
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground font-normal">
+                      <Clock className="h-3 w-3" />
+                      {lastFriendsUpdate.toLocaleTimeString()}
+                    </div>
+                  )}
+                </div>
+                
+                <div>
+                  <Button
+                    onClick={handleFindCommonGames}
+                    disabled={isLoadingCommon || friends.length === 0}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingCommon ? 'animate-spin' : ''}`} />
+                    Find Common Games
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Mobile layout - title, timestamp, then button in separate rows */}
+              <div className="lg:hidden space-y-2">
+                {/* Row 1: Title */}
+                <div className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  <span>Friends ({friends.length})</span>
+                </div>
+                
+                {/* Row 2: Timestamp */}
                 {lastFriendsUpdate && (
                   <div className="flex items-center gap-1 text-sm text-muted-foreground font-normal">
                     <Clock className="h-3 w-3" />
                     {lastFriendsUpdate.toLocaleTimeString()}
                   </div>
                 )}
+                
+                {/* Row 3: Button */}
+                <div>
+                  <Button
+                    onClick={handleFindCommonGames}
+                    disabled={isLoadingCommon || friends.length === 0}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingCommon ? 'animate-spin' : ''}`} />
+                    Find Common Games
+                  </Button>
+                </div>
               </div>
-              <Button
-                onClick={handleFindCommonGames}
-                disabled={isLoadingCommon || friends.length === 0}
-                variant="outline"
-                size="sm"
-              >
-                <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingCommon ? 'animate-spin' : ''}`} />
-                Find Common Games
-              </Button>
             </CardTitle>
-            <CardDescription>
-              Click &quot;Find Common Games&quot; to discover what you can play together
+            <CardDescription className="space-y-1">
+              <div>Click &quot;Find Common Games&quot; to discover what you can play together</div>
+              {/* Row 3: Cached info */}
               {lastFriendsUpdate && (
-                <span className="ml-4 text-xs">
+                <div className="text-xs">
                   Cached • Last updated: {lastFriendsUpdate.toLocaleString()}
-                </span>
+                </div>
               )}
             </CardDescription>
           </CardHeader>
@@ -379,44 +475,74 @@ export function PlayTogetherView() {
                 const hasProfileData = isPublic || isPrivate;
                 
                 return (
-                  <div key={friend.steamId} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      {friend.avatar && (
-                        <Image 
-                          src={friend.avatar} 
-                          alt={`${friend.name} avatar`} 
-                          width={32}
-                          height={32}
-                          className="rounded-full"
-                          unoptimized
-                        />
-                      )}
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <div className="font-medium">{friend.name}</div>
-                          {hasProfileData && (
-                            <Badge 
-                              variant={isPublic ? "default" : "secondary"} 
-                              className="text-xs"
-                            >
-                              {isPublic ? (
-                                <><Eye className="h-3 w-3 mr-1" />Public</>
-                              ) : (
-                                <><EyeOff className="h-3 w-3 mr-1" />Private</>
-                              )}
-                            </Badge>
-                          )}
+                  <div key={friend.steamId} className="p-3 border rounded-lg">
+                    {/* Main content row */}
+                    <div className="flex items-center gap-3 lg:justify-between">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        {friend.avatar && (
+                          <Image 
+                            src={friend.avatar} 
+                            alt={`${friend.name} avatar`} 
+                            width={32}
+                            height={32}
+                            className="rounded-full flex-shrink-0"
+                            unoptimized
+                          />
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium truncate">{friend.name}</div>
+                          <div className="text-sm text-muted-foreground truncate">{friend.steamId}</div>
                         </div>
-                        <div className="text-sm text-muted-foreground">{friend.steamId}</div>
+                      </div>
+                      
+                      {/* Desktop badge and button */}
+                      <div className="hidden lg:flex lg:items-center lg:gap-2">
+                        {hasProfileData && (
+                          <Badge 
+                            variant={isPublic ? "default" : "secondary"} 
+                            className="text-xs"
+                          >
+                            {isPublic ? (
+                              <><Eye className="h-3 w-3 mr-1" />Public</>
+                            ) : (
+                              <><EyeOff className="h-3 w-3 mr-1" />Private</>
+                            )}
+                          </Badge>
+                        )}
+                        <Button
+                          onClick={() => handleRemoveFriend(friend.steamId)}
+                          variant="ghost"
+                          size="sm"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
-                    <Button
-                      onClick={() => handleRemoveFriend(friend.steamId)}
-                      variant="ghost"
-                      size="sm"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    
+                    {/* Mobile badge and button row */}
+                    <div className="flex items-center justify-between mt-2 lg:hidden">
+                      <div>
+                        {hasProfileData && (
+                          <Badge 
+                            variant={isPublic ? "default" : "secondary"} 
+                            className="text-xs"
+                          >
+                            {isPublic ? (
+                              <><Eye className="h-3 w-3 mr-1" />Public</>
+                            ) : (
+                              <><EyeOff className="h-3 w-3 mr-1" />Private</>
+                            )}
+                          </Badge>
+                        )}
+                      </div>
+                      <Button
+                        onClick={() => handleRemoveFriend(friend.steamId)}
+                        variant="ghost"
+                        size="sm"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 );
               })}
@@ -428,8 +554,9 @@ export function PlayTogetherView() {
       {/* Common Games */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <div className="flex items-center gap-2">
+          <CardTitle className="space-y-2">
+            {/* Desktop layout - title with timestamp inline */}
+            <div className="hidden lg:flex lg:items-center lg:gap-2">
               <Play className="h-5 w-5" />
               <span>Games You Can Play Together</span>
               {lastCommonGamesUpdate && (
@@ -439,11 +566,28 @@ export function PlayTogetherView() {
                 </div>
               )}
             </div>
+            
+            {/* Mobile layout - title, then timestamp in separate rows */}
+            <div className="lg:hidden space-y-2">
+              {/* Row 1: Title */}
+              <div className="flex items-center gap-2">
+                <Play className="h-5 w-5" />
+                <span>Games You Can Play Together</span>
+              </div>
+              
+              {/* Row 2: Timestamp */}
+              {lastCommonGamesUpdate && (
+                <div className="flex items-center gap-1 text-sm text-muted-foreground font-normal">
+                  <Clock className="h-3 w-3" />
+                  {lastCommonGamesUpdate.toLocaleTimeString()}
+                </div>
+              )}
+            </div>
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="space-y-2">
             {commonGames.length > 0 && (
               <div className="space-y-1">
-                <span>Found {commonGames.length} common games | Showing: {filteredGames.length}</span>
+                <div>Found {commonGames.length} common games | Showing: {filteredGames.length}</div>
                 {(() => {
                   // Only show visibility info for friends that are currently in the comparison list
                   const currentFriendIds = friends.map(f => f.steamId);
@@ -457,24 +601,26 @@ export function PlayTogetherView() {
                   return (
                     <div className="text-sm">
                       {currentPublicFriends.length > 0 && (
-                        <span className="text-green-600 dark:text-green-400">
+                        <div className="text-green-600 dark:text-green-400">
                           Games found with {currentPublicFriends.length} friend{currentPublicFriends.length !== 1 ? 's' : ''}: {currentPublicFriends.map(id => friends.find(f => f.steamId === id)?.name || id).join(', ')}
-                        </span>
+                        </div>
                       )}
                       {currentPrivateFriends.length > 0 && (
-                        <span className={`${currentPublicFriends.length > 0 ? 'block mt-1' : ''} text-orange-600 dark:text-orange-400`}>
-                                                     {`${currentPrivateFriends.length} friend${currentPrivateFriends.length !== 1 ? 's' : ''} couldn't be included (private profile${currentPrivateFriends.length !== 1 ? 's' : ''}): ${currentPrivateFriends.map(id => friends.find(f => f.steamId === id)?.name || id).join(', ')}`}
-                        </span>
+                        <div className="text-orange-600 dark:text-orange-400">
+                          {`${currentPrivateFriends.length} friend${currentPrivateFriends.length !== 1 ? 's' : ''} couldn't be included (private profile${currentPrivateFriends.length !== 1 ? 's' : ''}): ${currentPrivateFriends.map(id => friends.find(f => f.steamId === id)?.name || id).join(', ')}`}
+                        </div>
                       )}
                     </div>
                   );
                 })()}
               </div>
             )}
+            
+            {/* Row 3: Cached info */}
             {lastCommonGamesUpdate && (
-              <span className="ml-4 text-xs">
+              <div className="text-xs">
                 Cached • Last updated: {lastCommonGamesUpdate.toLocaleString()}
-              </span>
+              </div>
             )}
           </CardDescription>
         </CardHeader>
