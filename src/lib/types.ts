@@ -46,6 +46,8 @@ export interface SteamFriend {
 export interface UserSettings {
   steamApiKey: string;
   steamId: string;
+  steamUsername?: string;
+  steamAvatar?: string;
   theme: 'light' | 'dark' | 'system';
 }
 

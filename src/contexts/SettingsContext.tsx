@@ -15,6 +15,8 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 const DEFAULT_SETTINGS: UserSettings = {
   steamApiKey: '',
   steamId: '',
+  steamUsername: undefined,
+  steamAvatar: undefined,
   theme: 'system',
 };
 

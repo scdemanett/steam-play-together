@@ -165,14 +165,16 @@ export function SettingsView() {
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete your:
-                  <ul className="list-disc list-inside mt-2 space-y-1">
-                    <li>Steam API key</li>
-                    <li>Steam ID</li>
-                    <li>Theme preferences</li>
-                    <li>All cached data</li>
-                  </ul>
+                <AlertDialogDescription asChild>
+                  <div>
+                    <p>This action cannot be undone. This will permanently delete your:</p>
+                    <ul className="list-disc list-inside mt-2 space-y-1">
+                      <li>Steam API key</li>
+                      <li>Steam ID</li>
+                      <li>Theme preferences</li>
+                      <li>All cached data</li>
+                    </ul>
+                  </div>
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

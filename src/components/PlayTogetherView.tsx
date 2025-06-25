@@ -272,7 +272,11 @@ export function PlayTogetherView() {
           <CardContent>
             <div className="space-y-2 max-h-60 overflow-y-auto">
               {availableSteamFriends.map((friend) => (
-                <div key={friend.steamId} className="flex items-center gap-3 p-3 border rounded-lg">
+                <div 
+                  key={friend.steamId} 
+                  className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => handleSteamFriendToggle(friend.steamId)}
+                >
                   <Checkbox
                     checked={selectedSteamFriends.has(friend.steamId)}
                     onCheckedChange={() => handleSteamFriendToggle(friend.steamId)}

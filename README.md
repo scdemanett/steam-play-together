@@ -36,6 +36,12 @@ Steam Play Together is a modern web application that helps you discover which ga
 - **Real-time Status**: See cache status and last updated timestamps
 - **Toast Notifications**: Clear feedback for all actions
 
+### 🔐 **Secure Authentication**
+- **Steam OpenID 2.0 Login**: Official Steam authentication (recommended)
+- **Manual Entry Option**: Enter Steam ID or username if preferred
+- **Automatic Account Linking**: Steam login automatically retrieves your Steam ID
+- **Secure Session Handling**: Temporary cookie-based authentication flow
+
 ### 🔒 **Privacy & Security**
 - **Local API Key Storage**: Your Steam API key is stored only in your browser's localStorage
 - **Secure Proxy Routes**: API key is sent only to our Next.js backend (never stored server-side)
@@ -62,12 +68,18 @@ Steam Play Together is a modern web application that helps you discover which ga
    npm install
    ```
 
-3. **Start the development server**
+3. **Set up environment variables (optional for local development)**
+   ```bash
+   # Copy from example file
+   cp env.example .env.local
+   ```
+
+4. **Start the development server**
    ```bash
    npm run dev
    ```
 
-4. **Open in your browser**
+5. **Open in your browser**
    ```
    http://localhost:3000
    ```
@@ -79,15 +91,28 @@ Steam Play Together is a modern web application that helps you discover which ga
    - Register using your Steam account
    - Your API key will be displayed - copy it!
 
-2. **Find your Steam ID**
-   - Visit [SteamID.io](https://steamid.io/)
-   - Enter your Steam profile URL or username
-   - Copy the 64-bit Steam ID (starts with 765...)
+2. **Configure the app**
+   - Go to the app in your browser
+   - Enter your Steam API Key when prompted
+   - Choose your preferred authentication method:
+     - **Steam Login (Recommended)**: Click "Login with Steam" for automatic setup
+     - **Manual Entry**: Enter your Steam ID or username manually
 
-3. **Configure the app**
-   - Go to Settings in the app
-   - Enter your Steam API Key and Steam ID
-   - Click "Test Configuration" to verify
+3. **Environment Variables**
+   
+   **For Local Development:**
+   ```bash
+   # Copy env.example to .env.local
+   cp env.example .env.local
+   ```
+   
+   **For Production Deployment:**
+   Set the following environment variable in your hosting platform:
+   ```bash
+   NEXT_PUBLIC_APP_URL=https://yourdomain.com
+   ```
+   
+   See the [Environment Variables](#environment-variables) section below for detailed setup instructions.
 
 ## 📖 How to Use
 
@@ -146,6 +171,54 @@ Browser (localStorage) → Next.js API Routes → Steam Web API
 - Server-side rate limiting and error handling
 - No server-side API key storage or persistence
 - Consistent error messages for users
+
+## 🌍 Environment Variables
+
+### **Required for Production Deployment**
+
+The app requires environment variables to function correctly in production, particularly for Steam authentication.
+
+### **Setup Instructions**
+
+1. **Create environment file**
+   ```bash
+   # For local development, copy from example
+   cp env.example .env.local
+   
+   # Or create manually
+   echo "NEXT_PUBLIC_APP_URL=http://localhost:3000" > .env.local
+   ```
+
+2. **For Production Deployment**
+   
+   Set `NEXT_PUBLIC_APP_URL` to your actual deployed domain:
+
+   **Vercel:**
+   - Go to Project Settings → Environment Variables
+   - Add: `NEXT_PUBLIC_APP_URL` = `https://your-app-name.vercel.app`
+
+   **Netlify:**
+   - Go to Site Settings → Environment Variables  
+   - Add: `NEXT_PUBLIC_APP_URL` = `https://your-app-name.netlify.app`
+
+   **Other Platforms:**
+   - Set `NEXT_PUBLIC_APP_URL` to your deployed URL
+   - Example: `https://steam-play-together.com`
+
+### **Why This Is Required**
+
+- **Steam Authentication**: Steam OAuth requires a valid return URL
+- **Security**: Ensures Steam can validate and redirect to your domain
+- **CORS**: Prevents cross-origin issues in production
+
+### **Environment Variables Reference**
+
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `NEXT_PUBLIC_APP_URL` | Your app's deployed URL | Yes (Production) | `http://localhost:3000` |
+| `NODE_ENV` | Environment mode | No | Auto-set by hosting platforms |
+
+⚠️ **Important**: Without `NEXT_PUBLIC_APP_URL` in production, Steam login will fail because it tries to redirect to `localhost:3000`.
 
 ## 🔧 API Endpoints
 

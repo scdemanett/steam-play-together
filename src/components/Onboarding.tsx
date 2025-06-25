@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import { CheckCircle, ExternalLink, Eye, EyeOff } from 'lucide-react';
 import { useSettings } from '@/contexts/SettingsContext';
 import { SteamAPI } from '@/lib/steam-api';
 import { toast } from 'sonner';
+import axios from 'axios';
 
 interface OnboardingProps {
   onComplete: () => void;
@@ -23,8 +24,48 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   const [steamIdInput, setSteamIdInput] = useState('');
   const [isValidatingApiKey, setIsValidatingApiKey] = useState(false);
   const [isValidatingSteamId, setIsValidatingSteamId] = useState(false);
+  const [isSteamAuthenticating, setIsSteamAuthenticating] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+
+  // Handle Steam authentication callback
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.get('steam_auth_success') === 'true') {
+      const steamId = urlParams.get('steam_id');
+      const steamName = urlParams.get('steam_name');
+      const steamAvatar = urlParams.get('steam_avatar');
+      const apiKeyFromUrl = urlParams.get('api_key');
+      
+      if (steamId && apiKeyFromUrl) {
+        // Complete setup with Steam data
+        updateSettings({
+          steamApiKey: apiKeyFromUrl,
+          steamId: steamId,
+          steamUsername: steamName || undefined,
+          steamAvatar: steamAvatar || undefined,
+        });
+        
+        toast.success(`Welcome ${steamName}! Your Steam account has been linked.`);
+        
+        // Clean up URL parameters
+        window.history.replaceState({}, '', window.location.pathname);
+        
+        onComplete();
+      }
+    } else if (urlParams.get('error')) {
+      const error = urlParams.get('error');
+      if (error === 'steam_auth_expired') {
+        toast.error('Steam authentication expired. Please try again.');
+      } else if (error === 'steam_auth_failed') {
+        toast.error('Steam authentication failed. Please try again.');
+      }
+      
+      // Clean up URL parameters
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [updateSettings, onComplete]);
 
   const validateApiKey = async () => {
     if (!apiKey.trim()) {
@@ -80,10 +121,27 @@ export function Onboarding({ onComplete }: OnboardingProps) {
       if (testGames) {
         toast.success('Steam profile validated successfully!');
         
+        // Fetch user's profile info (username and avatar)
+        let steamUsername: string | undefined;
+        let steamAvatar: string | undefined;
+        
+        try {
+          const playerInfo = await SteamAPI.getPlayerSummaries([finalSteamId], apiKey);
+          if (playerInfo.length > 0) {
+            steamUsername = playerInfo[0].personaname;
+            steamAvatar = playerInfo[0].avatar;
+          }
+        } catch (error) {
+          console.warn('Failed to fetch player info:', error);
+          // Continue without player info - not a critical error
+        }
+        
         // Save settings and complete onboarding
         updateSettings({
           steamApiKey: apiKey,
           steamId: finalSteamId,
+          steamUsername,
+          steamAvatar,
         });
         
         onComplete();
@@ -94,6 +152,27 @@ export function Onboarding({ onComplete }: OnboardingProps) {
       toast.error('Failed to validate Steam ID. Please try again.');
     } finally {
       setIsValidatingSteamId(false);
+    }
+  };
+
+  const handleSteamLogin = async () => {
+    if (!apiKey.trim()) {
+      toast.error('Please enter your Steam API key first');
+      return;
+    }
+
+    setIsSteamAuthenticating(true);
+    try {
+      const response = await axios.post('/api/auth/steam', { apiKey: apiKey.trim() });
+      
+      if (response.data.redirectUrl) {
+        // Redirect to Steam for authentication
+        window.location.href = response.data.redirectUrl;
+      }
+    } catch (error) {
+      console.error('Steam auth error:', error);
+      toast.error('Failed to initiate Steam authentication. Please try again.');
+      setIsSteamAuthenticating(false);
     }
   };
 
@@ -187,37 +266,81 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                   <span className="font-medium">API Key Validated</span>
                 </div>
 
-                <div>
-                  <Label htmlFor="steamId">Steam ID or Username</Label>
-                  <Input
-                    id="steamId"
-                    placeholder="Enter your Steam ID or username"
-                    value={steamIdInput}
-                    onChange={(e) => setSteamIdInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && validateSteamId()}
-                  />
-                  <p className="text-sm text-gray-500 mt-1">
-                    You can enter either your Steam ID (numbers) or your Steam username
-                  </p>
-                </div>
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <h3 className="text-lg font-medium mb-2">Link Your Steam Account</h3>
+                    <p className="text-sm text-gray-500 mb-4">
+                      Choose how you&apos;d like to connect your Steam account
+                    </p>
+                  </div>
 
-                <Button 
-                  onClick={validateSteamId} 
-                  disabled={isValidatingSteamId || !steamIdInput.trim()}
-                  className="w-full"
-                >
-                  {isValidatingSteamId ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                      Validating...
+                  {/* Steam Login Option */}
+                  <div className="space-y-3">
+                                         <Button 
+                       onClick={handleSteamLogin}
+                       disabled={isSteamAuthenticating}
+                       className="w-full bg-steam-blue hover:bg-steam-blue-hover text-gray-900 transition-colors"
+                       size="lg"
+                     >
+                      {isSteamAuthenticating ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          Redirecting to Steam...
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">🎮</span>
+                          Login with Steam (Recommended)
+                        </div>
+                      )}
+                    </Button>
+                    <p className="text-xs text-center text-gray-500">
+                      Secure login through Steam - automatically gets your Steam ID
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 border-t" />
+                    <span className="text-sm text-muted-foreground">or</span>
+                    <div className="flex-1 border-t" />
+                  </div>
+
+                                     {/* Manual Steam ID Entry */}
+                   <div className="space-y-3">
+                     <div>
+                       <Label htmlFor="steamId" className="block mb-3">Manual Steam ID Entry</Label>
+                       <Input
+                        id="steamId"
+                        placeholder="Enter your Steam ID or username"
+                        value={steamIdInput}
+                        onChange={(e) => setSteamIdInput(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && validateSteamId()}
+                      />
+                      <p className="text-sm text-gray-500 mt-1">
+                        Enter your Steam ID (numbers) or Steam username
+                      </p>
                     </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4" />
-                      Complete Setup
-                    </div>
-                  )}
-                </Button>
+
+                    <Button 
+                      onClick={validateSteamId} 
+                      disabled={isValidatingSteamId || !steamIdInput.trim()}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      {isValidatingSteamId ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          Validating...
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4" />
+                          Complete Setup Manually
+                        </div>
+                      )}
+                    </Button>
+                  </div>
+                </div>
               </div>
             )}
           </CardContent>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Settings, Library, Users } from 'lucide-react';
 import { useSettings } from '@/contexts/SettingsContext';
@@ -23,10 +24,27 @@ export function MainApp() {
               <h1 className="text-xl font-bold">Steam Play Together</h1>
             </div>
             
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">
-                Steam ID: {settings?.steamId}
-              </span>
+            <div className="flex items-center gap-3">
+              {settings?.steamAvatar && (
+                <Image
+                  src={settings.steamAvatar}
+                  alt="Steam Avatar"
+                  width={32}
+                  height={32}
+                  className="rounded-full"
+                  unoptimized
+                />
+              )}
+              <div className="flex flex-col items-end">
+                {settings?.steamUsername && (
+                  <span className="text-sm font-medium">
+                    {settings.steamUsername}
+                  </span>
+                )}
+                <span className="text-xs text-muted-foreground">
+                  ID: {settings?.steamId}
+                </span>
+              </div>
             </div>
           </div>
         </div>
