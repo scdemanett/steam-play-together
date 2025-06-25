@@ -56,7 +56,7 @@ export function MainApp() {
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="library" className="flex items-center gap-2">
               <Library className="h-4 w-4" />
-              My Library
+              Games Library
             </TabsTrigger>
             <TabsTrigger value="play-together" className="flex items-center gap-2">
               <Users className="h-4 w-4" />

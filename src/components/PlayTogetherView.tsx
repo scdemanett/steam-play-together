@@ -183,11 +183,31 @@ export function PlayTogetherView() {
             Add Friends
           </CardTitle>
           <CardDescription>
-            Add friends by Steam ID or username to find games you can play together
+            Add friends from your friends list or by Steam ID or username to find games you can play together
           </CardDescription>
         </CardHeader>
         
         <CardContent className="space-y-4">
+          <Button 
+            onClick={handleLoadSteamFriends}
+            disabled={isLoadingSteamFriends}
+            variant="outline"
+            className="w-full"
+          >
+            {isLoadingSteamFriends ? (
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <ListRestart className="h-4 w-4 mr-2" />
+            )}
+            Load Friends from Steam
+          </Button>
+          
+          <div className="flex items-center gap-2">
+            <div className="flex-1 border-t" />
+            <span className="text-sm text-muted-foreground">or</span>
+            <div className="flex-1 border-t" />
+          </div>
+
           <div className="flex gap-2">
             <Input
               placeholder="Enter Steam ID or username..."
@@ -210,26 +230,6 @@ export function PlayTogetherView() {
               )}
             </Button>
           </div>
-          
-          <div className="flex items-center gap-2">
-            <div className="flex-1 border-t" />
-            <span className="text-sm text-muted-foreground">or</span>
-            <div className="flex-1 border-t" />
-          </div>
-          
-          <Button 
-            onClick={handleLoadSteamFriends}
-            disabled={isLoadingSteamFriends}
-            variant="outline"
-            className="w-full"
-          >
-            {isLoadingSteamFriends ? (
-              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <ListRestart className="h-4 w-4 mr-2" />
-            )}
-            Load Friends from Steam
-          </Button>
         </CardContent>
       </Card>
 
