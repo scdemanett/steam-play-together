@@ -114,90 +114,6 @@ export function LibraryView() {
     };
   }, [filteredAndSortedGames, currentPage, itemsPerPage]);
 
-  // Memoized pagination component to avoid re-renders
-  const PaginationControls = useMemo(() => {
-    if (paginationData.totalPages <= 1) return null;
-
-    return (
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">
-            Showing {paginationData.startIndex + 1} to {paginationData.endIndex} of {paginationData.totalItems} games
-          </span>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm">Items per page:</span>
-            <Select
-              value={itemsPerPage.toString()}
-              onValueChange={(value) => {
-                setItemsPerPage(Number(value));
-              }}
-            >
-              <SelectTrigger className="w-20 h-8">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            
-            <div className="flex items-center gap-1">
-              {Array.from({ length: Math.min(5, paginationData.totalPages) }, (_, i) => {
-                let pageNum;
-                if (paginationData.totalPages <= 5) {
-                  pageNum = i + 1;
-                } else if (currentPage <= 3) {
-                  pageNum = i + 1;
-                } else if (currentPage >= paginationData.totalPages - 2) {
-                  pageNum = paginationData.totalPages - 4 + i;
-                } else {
-                  pageNum = currentPage - 2 + i;
-                }
-                
-                return (
-                  <Button
-                    key={pageNum}
-                    variant={currentPage === pageNum ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setCurrentPage(pageNum)}
-                    className="w-8 h-8 p-0"
-                  >
-                    {pageNum}
-                  </Button>
-                );
-              })}
-            </div>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(Math.min(paginationData.totalPages, currentPage + 1))}
-              disabled={currentPage === paginationData.totalPages}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }, [paginationData, currentPage, itemsPerPage, setCurrentPage, setItemsPerPage]);
-
   // Handle successful load with toast notification
   useEffect(() => {
     if (isLoaded && gameCount > 0 && !error) {
@@ -228,10 +144,11 @@ export function LibraryView() {
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+        <CardHeader className="space-y-3">
+          {/* Row 1: Card title with time - responsive layout */}
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-center gap-2">
-              <span>Steam Games Library</span>
+              <CardTitle>Steam Games Library</CardTitle>
               {lastUpdated && (
                 <div className="flex items-center gap-1 text-sm text-muted-foreground font-normal">
                   <Clock className="h-3 w-3" />
@@ -239,6 +156,8 @@ export function LibraryView() {
                 </div>
               )}
             </div>
+            
+            {/* Row 2: Reset and Refresh buttons - inline on large screens */}
             <div className="flex gap-2">
               <Button
                 onClick={resetTableView}
@@ -257,17 +176,24 @@ export function LibraryView() {
                 Refresh
               </Button>
             </div>
-          </CardTitle>
-          <CardDescription>
+          </div>
+          
+          {/* Rows 3 & 4: Stats and cached data - responsive layout */}
+          <div className="flex flex-col gap-1 lg:flex-row lg:items-center lg:gap-4">
+            {/* Row 3: Total, filtered, showing line */}
             {gameCount > 0 && (
-              <span>Total: {gameCount} | Filtered: {paginationData.totalItems} | Showing: {paginationData.currentPageGames.length}</span>
+              <div className="text-sm text-muted-foreground">
+                Total: {gameCount} | Filtered: {paginationData.totalItems} | Showing: {paginationData.currentPageGames.length}
+              </div>
             )}
+            
+            {/* Row 4: Cached data line */}
             {lastUpdated && (
-              <span className="ml-4 text-xs">
+              <div className="text-xs text-muted-foreground">
                 Cached data • Last updated: {lastUpdated.toLocaleString()}
-              </span>
+              </div>
             )}
-          </CardDescription>
+          </div>
         </CardHeader>
         
         <CardContent>
@@ -294,9 +220,87 @@ export function LibraryView() {
           ) : games.length > 0 ? (
             <>
               {/* Pagination Controls - Top */}
-              {PaginationControls && (
+              {paginationData.totalPages > 1 && (
                 <div className="mb-4">
-                  {PaginationControls}
+                  {/* Responsive pagination layout */}
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                    {/* Showing X to Y of Z games */}
+                    <div className="text-sm text-muted-foreground">
+                      Showing {paginationData.startIndex + 1} to {paginationData.endIndex} of {paginationData.totalItems} games
+                    </div>
+                    
+                    {/* Items per page and pagination controls */}
+                    <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-4">
+                      {/* Items per page */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">Items per page:</span>
+                        <Select
+                          value={itemsPerPage.toString()}
+                          onValueChange={(value) => {
+                            setItemsPerPage(Number(value));
+                          }}
+                        >
+                          <SelectTrigger className="w-20 h-8">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="10">10</SelectItem>
+                            <SelectItem value="25">25</SelectItem>
+                            <SelectItem value="50">50</SelectItem>
+                            <SelectItem value="100">100</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      {/* Pagination */}
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                          disabled={currentPage === 1}
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: Math.min(5, paginationData.totalPages) }, (_, i) => {
+                            let pageNum;
+                            if (paginationData.totalPages <= 5) {
+                              pageNum = i + 1;
+                            } else if (currentPage <= 3) {
+                              pageNum = i + 1;
+                            } else if (currentPage >= paginationData.totalPages - 2) {
+                              pageNum = paginationData.totalPages - 4 + i;
+                            } else {
+                              pageNum = currentPage - 2 + i;
+                            }
+                            
+                            return (
+                              <Button
+                                key={pageNum}
+                                variant={currentPage === pageNum ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => setCurrentPage(pageNum)}
+                                className="w-8 h-8 p-0"
+                              >
+                                {pageNum}
+                              </Button>
+                            );
+                          })}
+                        </div>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(Math.min(paginationData.totalPages, currentPage + 1))}
+                          disabled={currentPage === paginationData.totalPages}
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -383,9 +387,87 @@ export function LibraryView() {
               </div>
 
               {/* Pagination Controls - Bottom */}
-              {PaginationControls && (
+              {paginationData.totalPages > 1 && (
                 <div className="mt-4">
-                  {PaginationControls}
+                  {/* Responsive pagination layout */}
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                    {/* Showing X to Y of Z games */}
+                    <div className="text-sm text-muted-foreground">
+                      Showing {paginationData.startIndex + 1} to {paginationData.endIndex} of {paginationData.totalItems} games
+                    </div>
+                    
+                    {/* Items per page and pagination controls */}
+                    <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-4">
+                      {/* Items per page */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">Items per page:</span>
+                        <Select
+                          value={itemsPerPage.toString()}
+                          onValueChange={(value) => {
+                            setItemsPerPage(Number(value));
+                          }}
+                        >
+                          <SelectTrigger className="w-20 h-8">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="10">10</SelectItem>
+                            <SelectItem value="25">25</SelectItem>
+                            <SelectItem value="50">50</SelectItem>
+                            <SelectItem value="100">100</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      {/* Pagination */}
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                          disabled={currentPage === 1}
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: Math.min(5, paginationData.totalPages) }, (_, i) => {
+                            let pageNum;
+                            if (paginationData.totalPages <= 5) {
+                              pageNum = i + 1;
+                            } else if (currentPage <= 3) {
+                              pageNum = i + 1;
+                            } else if (currentPage >= paginationData.totalPages - 2) {
+                              pageNum = paginationData.totalPages - 4 + i;
+                            } else {
+                              pageNum = currentPage - 2 + i;
+                            }
+                            
+                            return (
+                              <Button
+                                key={pageNum}
+                                variant={currentPage === pageNum ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => setCurrentPage(pageNum)}
+                                className="w-8 h-8 p-0"
+                              >
+                                {pageNum}
+                              </Button>
+                            );
+                          })}
+                        </div>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(Math.min(paginationData.totalPages, currentPage + 1))}
+                          disabled={currentPage === paginationData.totalPages}
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </>
