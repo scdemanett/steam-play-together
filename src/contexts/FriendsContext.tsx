@@ -249,19 +249,29 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
         throw new Error('No friends found on your Steam friends list');
       }
 
-      // Get friend details in batches (limit to first 20 friends)
-      const friendSteamIds = friendsList.slice(0, 20).map(f => f.steamid);
-      const playerSummaries = await SteamAPI.getPlayerSummaries(friendSteamIds, settings.steamApiKey);
-      
+      // Get all friend details in batches (Steam API supports up to 100 IDs per request)
+      const friendSteamIds = friendsList.map(f => f.steamid);
       const loadedSteamFriends: Friend[] = [];
       
-      for (const player of playerSummaries) {
-        loadedSteamFriends.push({
-          steamId: player.steamid,
-          name: player.personaname || `User ${player.steamid}`,
-          isPublic: true, // We'll verify this later when needed
-          avatar: player.avatar
-        });
+      // Process friends in batches of 100
+      const BATCH_SIZE = 100;
+      for (let i = 0; i < friendSteamIds.length; i += BATCH_SIZE) {
+        const batch = friendSteamIds.slice(i, i + BATCH_SIZE);
+        const playerSummaries = await SteamAPI.getPlayerSummaries(batch, settings.steamApiKey);
+        
+        for (const player of playerSummaries) {
+          loadedSteamFriends.push({
+            steamId: player.steamid,
+            name: player.personaname || `User ${player.steamid}`,
+            isPublic: true, // We'll verify this later when needed
+            avatar: player.avatar
+          });
+        }
+        
+        // Add a small delay between batches to avoid rate limiting
+        if (i + BATCH_SIZE < friendSteamIds.length) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
       }
 
       // Just store the Steam friends for selection, don't add to main friends list yet
