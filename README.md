@@ -4,6 +4,10 @@
 
 Steam Play Together is a modern web application that helps you discover which games you have in common with your Steam friends. No more scrolling through endless Steam libraries or asking "What should we play?" in Discord.
 
+## 🌐 Live Demo
+
+**[Try Steam Play Together Now →](https://steam-play-together.vercel.app/)**
+
 [![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0+-06B6D4)](https://tailwindcss.com/)
