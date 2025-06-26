@@ -276,24 +276,27 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
                   {/* Steam Login Option */}
                   <div className="space-y-3">
-                                         <Button 
-                       onClick={handleSteamLogin}
-                       disabled={isSteamAuthenticating}
-                       className="w-full bg-steam-blue hover:bg-steam-blue-hover text-gray-900 transition-colors"
-                       size="lg"
-                     >
-                      {isSteamAuthenticating ? (
-                        <div className="flex items-center gap-2">
-                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                          Redirecting to Steam...
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <span className="text-xl">🎮</span>
-                          Login with Steam (Recommended)
+                    <div className="relative">
+                      <button
+                        onClick={handleSteamLogin}
+                        disabled={isSteamAuthenticating}
+                        className="block mx-auto hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <img
+                          src="/sign-in-through-steam_01.png"
+                          alt="Sign in through Steam"
+                          className="h-auto max-w-full"
+                        />
+                      </button>
+                      {isSteamAuthenticating && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black rounded">
+                          <div className="flex items-center gap-2 text-white font-medium">
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            Redirecting to Steam...
+                          </div>
                         </div>
                       )}
-                    </Button>
+                    </div>
                     <p className="text-xs text-center text-gray-500">
                       Secure login through Steam - automatically gets your Steam ID
                     </p>
