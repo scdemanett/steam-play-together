@@ -14,8 +14,11 @@ export async function POST(request: NextRequest) {
 
     try {
       const response = await axios.get(url);
-      // If we get a response with games or even an empty response, the profile is public
-      const isPublic = response.data?.response !== undefined;
+      // Public if we get a response object with either games or game_count property
+      // Private profiles return {"response": {}} - empty response object
+      const isPublic = response.data?.response && 
+                       (response.data.response.games !== undefined || 
+                        response.data.response.game_count !== undefined);
       return NextResponse.json({ isPublic });
     } catch (error: unknown) {
       // If we get a 403, the profile is private

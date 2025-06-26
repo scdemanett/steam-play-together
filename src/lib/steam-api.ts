@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { SteamOwnedGamesResponse, SteamAppDetails, SteamFriend, SteamGame } from './types';
+import { SteamOwnedGamesResponse, SteamAppDetails, SteamFriend, SteamGame } from '@/lib/types';
 
 
 

@@ -188,26 +188,6 @@ export function PlayTogetherView() {
         </CardHeader>
         
         <CardContent className="space-y-4">
-          <Button 
-            onClick={handleLoadSteamFriends}
-            disabled={isLoadingSteamFriends}
-            variant="outline"
-            className="w-full"
-          >
-            {isLoadingSteamFriends ? (
-              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <ListRestart className="h-4 w-4 mr-2" />
-            )}
-            Load Friends from Steam
-          </Button>
-          
-          <div className="flex items-center gap-2">
-            <div className="flex-1 border-t" />
-            <span className="text-sm text-muted-foreground">or</span>
-            <div className="flex-1 border-t" />
-          </div>
-
           <div className="flex gap-2">
             <Input
               placeholder="Enter Steam ID or username..."
@@ -230,6 +210,26 @@ export function PlayTogetherView() {
               )}
             </Button>
           </div>
+          
+          <div className="flex items-center gap-2">
+            <div className="flex-1 border-t" />
+            <span className="text-sm text-muted-foreground">or</span>
+            <div className="flex-1 border-t" />
+          </div>
+
+          <Button 
+            onClick={handleLoadSteamFriends}
+            disabled={isLoadingSteamFriends}
+            variant="outline"
+            className="w-full"
+          >
+            {isLoadingSteamFriends ? (
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <ListRestart className="h-4 w-4 mr-2" />
+            )}
+            Load Friends from Steam
+          </Button>
         </CardContent>
       </Card>
 
@@ -343,25 +343,10 @@ export function PlayTogetherView() {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 lg:justify-between">
                           <div className="font-medium truncate">{friend.name}</div>
-                          {/* Desktop badge */}
-                          {hasProfileData && (
-                            <Badge 
-                              variant={isPublic ? "default" : "secondary"} 
-                              className="text-xs hidden lg:inline-flex"
-                            >
-                              {isPublic ? (
-                                <><Eye className="h-3 w-3 mr-1" />Public</>
-                              ) : (
-                                <><EyeOff className="h-3 w-3 mr-1" />Private</>
-                              )}
-                            </Badge>
-                          )}
                         </div>
                         <div className="text-sm text-muted-foreground truncate">{friend.steamId}</div>
-                        
-                        {/* Mobile badge */}
-                        {hasProfileData && (
-                          <div className="mt-1 lg:hidden">
+                        <div className="flex gap-2 mt-1">
+                          {hasProfileData && (
                             <Badge 
                               variant={isPublic ? "default" : "secondary"} 
                               className="text-xs"
@@ -372,8 +357,8 @@ export function PlayTogetherView() {
                                 <><EyeOff className="h-3 w-3 mr-1" />Private</>
                               )}
                             </Badge>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -492,48 +477,21 @@ export function PlayTogetherView() {
                         <div className="min-w-0 flex-1">
                           <div className="font-medium truncate">{friend.name}</div>
                           <div className="text-sm text-muted-foreground truncate">{friend.steamId}</div>
+                          <div className="flex gap-2 mt-1">
+                            {hasProfileData && (
+                              <Badge 
+                                variant={isPublic ? "default" : "secondary"} 
+                                className="text-xs"
+                              >
+                                {isPublic ? (
+                                  <><Eye className="h-3 w-3 mr-1" />Public</>
+                                ) : (
+                                  <><EyeOff className="h-3 w-3 mr-1" />Private</>
+                                )}
+                              </Badge>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                      
-                      {/* Desktop badge and button */}
-                      <div className="hidden lg:flex lg:items-center lg:gap-2">
-                        {hasProfileData && (
-                          <Badge 
-                            variant={isPublic ? "default" : "secondary"} 
-                            className="text-xs"
-                          >
-                            {isPublic ? (
-                              <><Eye className="h-3 w-3 mr-1" />Public</>
-                            ) : (
-                              <><EyeOff className="h-3 w-3 mr-1" />Private</>
-                            )}
-                          </Badge>
-                        )}
-                        <Button
-                          onClick={() => handleRemoveFriend(friend.steamId)}
-                          variant="ghost"
-                          size="sm"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    {/* Mobile badge and button row */}
-                    <div className="flex items-center justify-between mt-2 lg:hidden">
-                      <div>
-                        {hasProfileData && (
-                          <Badge 
-                            variant={isPublic ? "default" : "secondary"} 
-                            className="text-xs"
-                          >
-                            {isPublic ? (
-                              <><Eye className="h-3 w-3 mr-1" />Public</>
-                            ) : (
-                              <><EyeOff className="h-3 w-3 mr-1" />Private</>
-                            )}
-                          </Badge>
-                        )}
                       </div>
                       <Button
                         onClick={() => handleRemoveFriend(friend.steamId)}

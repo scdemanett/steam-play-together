@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -282,10 +283,12 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                         disabled={isSteamAuthenticating}
                         className="block mx-auto hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <img
+                        <Image
                           src="/sign-in-through-steam_01.png"
                           alt="Sign in through Steam"
                           className="h-auto max-w-full"
+                          width={180}
+                          height={35}
                         />
                       </button>
                       {isSteamAuthenticating && (

@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { SteamGame } from '@/lib/types';
 import { SteamAPI } from '@/lib/steam-api';
-import { useSettings } from './SettingsContext';
+import { useSettings } from '@/contexts/SettingsContext';
 
 interface Friend {
   steamId: string;
@@ -48,6 +48,7 @@ interface FriendsContextType {
   loadSteamFriends: () => Promise<number>;
   clearSteamFriends: () => void;
   findCommonGames: (friendsList?: Friend[]) => Promise<{ gamesCount: number; publicFriendsCount: number; privateFriendsCount: number; message: string }>;
+  updateProfileVisibility: (steamId: string, isPublic: boolean) => void;
   clearFriendsCache: () => void;
   clearCommonGamesCache: () => void;
 }
@@ -378,36 +379,90 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
     setLastCommonGamesUpdate(null);
   };
 
-      return (
-      <FriendsContext.Provider
-        value={{
-          friends,
-          steamFriends,
-          commonGames,
-          publicFriends,
-          privateFriends,
-          isLoadingFriends,
-          isLoadingSteamFriends,
-          isLoadingCommon,
-          friendsLoaded,
-          steamFriendsLoaded,
-          commonGamesLoaded,
-          lastFriendsUpdate,
-          lastSteamFriendsUpdate,
-          lastCommonGamesUpdate,
-          addFriend,
-          addSelectedSteamFriends,
-          removeFriend,
-          loadSteamFriends,
-          clearSteamFriends,
-          findCommonGames,
-          clearFriendsCache,
-          clearCommonGamesCache,
-        }}
-      >
-        {children}
-      </FriendsContext.Provider>
-    );
+  const updateProfileVisibility = useCallback((steamId: string, isPublic: boolean) => {
+    // Check if this update is actually necessary (avoid unnecessary state changes)
+    const isAlreadyPublic = publicFriends.includes(steamId);
+    const isAlreadyPrivate = privateFriends.includes(steamId);
+    
+    // If already in correct state, don't update
+    if ((isPublic && isAlreadyPublic) || (!isPublic && isAlreadyPrivate)) {
+      return;
+    }
+    
+    // Remove steamId from both arrays first (to avoid duplicates)
+    const cleanedPublicFriends = publicFriends.filter(id => id !== steamId);
+    const cleanedPrivateFriends = privateFriends.filter(id => id !== steamId);
+    
+    // Add to appropriate array based on visibility
+    if (isPublic) {
+      setPublicFriends([...cleanedPublicFriends, steamId]);
+      setPrivateFriends(cleanedPrivateFriends);
+    } else {
+      setPublicFriends(cleanedPublicFriends);
+      setPrivateFriends([...cleanedPrivateFriends, steamId]);
+    }
+    
+    // Update the cached common games data if it exists
+    const cached = localStorage.getItem(COMMON_GAMES_CACHE_KEY);
+    if (cached) {
+      try {
+        const cachedData: CachedCommonGamesData = JSON.parse(cached);
+        if (cachedData.steamId === settings?.steamId) {
+          // Update visibility arrays in cache
+          const updatedPublicFriends = (cachedData.publicFriends || []).filter(id => id !== steamId);
+          const updatedPrivateFriends = (cachedData.privateFriends || []).filter(id => id !== steamId);
+          
+          if (isPublic) {
+            updatedPublicFriends.push(steamId);
+          } else {
+            updatedPrivateFriends.push(steamId);
+          }
+          
+          const updatedCache = {
+            ...cachedData,
+            publicFriends: updatedPublicFriends,
+            privateFriends: updatedPrivateFriends
+          };
+          
+          localStorage.setItem(COMMON_GAMES_CACHE_KEY, JSON.stringify(updatedCache));
+        }
+      } catch (error) {
+        console.error('Failed to update cached visibility data:', error);
+      }
+    }
+  }, [publicFriends, privateFriends, settings?.steamId]);
+
+  return (
+    <FriendsContext.Provider
+      value={{
+        friends,
+        steamFriends,
+        commonGames,
+        publicFriends,
+        privateFriends,
+        isLoadingFriends,
+        isLoadingSteamFriends,
+        isLoadingCommon,
+        friendsLoaded,
+        steamFriendsLoaded,
+        commonGamesLoaded,
+        lastFriendsUpdate,
+        lastSteamFriendsUpdate,
+        lastCommonGamesUpdate,
+        addFriend,
+        addSelectedSteamFriends,
+        removeFriend,
+        loadSteamFriends,
+        clearSteamFriends,
+        findCommonGames,
+        updateProfileVisibility,
+        clearFriendsCache,
+        clearCommonGamesCache,
+      }}
+    >
+      {children}
+    </FriendsContext.Provider>
+  );
 }
 
 export function useFriends() {
