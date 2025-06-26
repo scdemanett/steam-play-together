@@ -9,6 +9,7 @@ import { useSettings } from '@/contexts/SettingsContext';
 import { LibraryView } from '@/components/LibraryView';
 import { PlayTogetherView } from '@/components/PlayTogetherView';
 import { SettingsView } from '@/components/SettingsView';
+import packageJson from '../../package.json';
 
 export function MainApp() {
   const { settings } = useSettings();
@@ -71,6 +72,13 @@ export function MainApp() {
             </Button>
           </div>
           <SettingsView />
+
+          {/* Version Display */}
+          <div className="mt-6 text-right">
+            <span className="text-xs text-muted-foreground">
+              v{packageJson.version}
+            </span>
+          </div>
         </main>
       </div>
     );
@@ -140,6 +148,13 @@ export function MainApp() {
             <PlayTogetherView />
           </TabsContent>
         </Tabs>
+
+        {/* Version Display */}
+        <div className="text-right">
+          <span className="text-xs text-muted-foreground">
+            v{packageJson.version}
+          </span>
+        </div>
       </main>
     </div>
   );
