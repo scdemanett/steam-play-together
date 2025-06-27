@@ -316,7 +316,7 @@ export function LibraryView() {
                   <RefreshCw className="h-4 w-4 animate-spin" />
                 ) : (
                   <>
-                    <Eye className="h-4 w-4 mr-2" />
+                    <Eye className="h-4 w-4" />
                     View
                   </>
                 )}
@@ -336,9 +336,9 @@ export function LibraryView() {
               className="w-full"
             >
               {isLoadingSteamFriends ? (
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                <RefreshCw className="h-4 w-4 animate-spin" />
               ) : (
-                <ListRestart className="h-4 w-4 mr-2" />
+                <ListRestart className="h-4 w-4" />
               )}
               Load Friends from Steam
             </Button>
@@ -451,35 +451,33 @@ export function LibraryView() {
                   }
                 </span>
                 {lastUpdated && (
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground font-normal">
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground font-normal whitespace-nowrap">
                     <Clock className="h-3 w-3" />
                     {new Date(lastUpdated).toLocaleTimeString()}
                   </div>
                 )}
               </div>
               
-              <div className="flex gap-2">
+              <div className="flex gap-2 ml-4">
                 {!viewingUser?.isOwnLibrary && (
                   <Button
                     onClick={handleReturnToOwnLibrary}
                     variant="outline"
                     size="sm"
                   >
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Your Steam Games Library
+                    <ArrowLeft className="h-4 w-4" />
+                    Your Library
                   </Button>
                 )}
                 
-                {viewingUser?.isOwnLibrary && (
-                  <Button
-                    onClick={() => setShowUserSelection(true)}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <Users className="h-4 w-4" />
-                    View Other User
-                  </Button>
-                )}
+                <Button
+                  onClick={() => setShowUserSelection(true)}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Users className="h-4 w-4" />
+                  Other Library
+                </Button>
                 
                 <Button
                   onClick={resetTableView}
@@ -531,27 +529,26 @@ export function LibraryView() {
                     variant="outline"
                     size="sm"
                   >
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Your Steam Games Library
+                    <ArrowLeft className="h-4 w-4" />
+                    Your Library
                   </Button>
                 )}
                 
-                {viewingUser?.isOwnLibrary && (
-                  <Button
-                    onClick={() => setShowUserSelection(true)}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <Users className="h-4 w-4 mr-2" />
-                    View Other User
-                  </Button>
-                )}
+                <Button
+                  onClick={() => setShowUserSelection(true)}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Users className="h-4 w-4" />
+                  Other Library
+                </Button>
                 
                 <Button
                   onClick={resetTableView}
                   variant="outline"
                   size="sm"
                 >
+                  <ListRestart className="h-4 w-4" />
                   Reset View
                 </Button>
                 <Button
@@ -560,7 +557,7 @@ export function LibraryView() {
                   variant="outline"
                   size="sm"
                 >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                   Refresh
                 </Button>
               </div>

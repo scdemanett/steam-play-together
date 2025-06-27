@@ -253,7 +253,7 @@ export function PlayTogetherView() {
             className="w-full"
           >
             {isLoadingSteamFriends ? (
-              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+              <RefreshCw className="h-4 w-4 animate-spin" />
             ) : (
               <ListRestart className="h-4 w-4" />
             )}
@@ -334,12 +334,12 @@ export function PlayTogetherView() {
                   >
                     {selectedSteamFriends.size === availableSteamFriends.length ? (
                       <>
-                        <X className="h-4 w-4 mr-2" />
+                        <X className="h-4 w-4" />
                         Unselect All
                       </>
                     ) : (
                       <>
-                        <Check className="h-4 w-4 mr-2" />
+                        <Check className="h-4 w-4" />
                         Select All
                       </>
                     )}
@@ -494,7 +494,7 @@ export function PlayTogetherView() {
                     variant="outline"
                     size="sm"
                   >
-                    <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingCommon ? 'animate-spin' : ''}`} />
+                    <RefreshCw className={`h-4 w-4 ${isLoadingCommon ? 'animate-spin' : ''}`} />
                     Find Common Games
                   </Button>
                   <Button
@@ -503,7 +503,7 @@ export function PlayTogetherView() {
                     variant="destructive"
                     size="sm"
                   >
-                    <Trash2 className="h-4 w-4 mr-2" />
+                    <Trash2 className="h-4 w-4" />
                     Remove All
                   </Button>
                 </div>
@@ -705,7 +705,7 @@ export function PlayTogetherView() {
                           size="sm"
                           variant="outline"
                         >
-                          <Play className="h-4 w-4 mr-2" />
+                          <Play className="h-4 w-4" />
                           Launch
                         </Button>
                       </TableCell>
