@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, RefreshCw, UserPlus, Play, Users, Trash2, Clock, ListCheck, ListRestart, Eye, EyeOff } from 'lucide-react';
+import { Search, RefreshCw, UserPlus, Play, Users, Trash2, Clock, Check, ListCheck, ListRestart, Eye, EyeOff, X } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { useFriends } from '@/contexts/FriendsContext';
@@ -34,6 +34,7 @@ export function PlayTogetherView() {
     addFriend,
     addSelectedSteamFriends,
     removeFriend,
+    removeAllFriends,
     loadSteamFriends,
     findCommonGames,
   } = useFriends();
@@ -41,6 +42,7 @@ export function PlayTogetherView() {
   const [filteredGames, setFilteredGames] = useState<SteamGame[]>([]);
   const [searchTerm, setSearchTerm] = useLocalStorage('play-together-search', '', settings?.steamId);
   const [newFriendInput, setNewFriendInput] = useState('');
+  const [searchPerformed, setSearchPerformed] = useState(false);
   const [selectedSteamFriendsArray, setSelectedSteamFriendsArray] = useLocalStorage<string[]>('play-together-selected', [], settings?.steamId);
   
   // Convert array to Set for easier manipulation
@@ -84,6 +86,7 @@ export function PlayTogetherView() {
     try {
       await addFriend(newFriendInput.trim());
       setNewFriendInput('');
+      setSearchPerformed(false); // Reset search state when friends are added
       toast.success('Friend added successfully!');
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to add friend';
@@ -129,6 +132,7 @@ export function PlayTogetherView() {
     const selectedCount = selectedSteamFriends.size;
     addSelectedSteamFriends(Array.from(selectedSteamFriends));
     setSelectedSteamFriends(new Set());
+    setSearchPerformed(false); // Reset search state when friends are added
     toast.success(`Added ${selectedCount} friend(s) to Play Together list`);
   };
 
@@ -136,25 +140,41 @@ export function PlayTogetherView() {
   const handleFindCommonGames = async () => {
     try {
       const result = await findCommonGames();
+      setSearchPerformed(true);
       
       if (result.gamesCount > 0) {
-        toast.success(`Found ${result.gamesCount} games you can play together with ${result.publicFriendsCount} friend${result.publicFriendsCount !== 1 ? 's' : ''}!`);
-      } else if (result.privateFriendsCount > 0 && result.publicFriendsCount === 0) {
-        toast.warning(`All ${result.privateFriendsCount} friend${result.privateFriendsCount !== 1 ? 's have' : ' has'} private Steam profiles. Ask them to make their game details public to find common games.`);
-      } else if (result.publicFriendsCount > 0) {
-        toast.info(`No common games found with ${result.publicFriendsCount} friend${result.publicFriendsCount !== 1 ? 's' : ''}.`);
+        // Games found - show success message with optional note about private friends
+        if (result.privateFriendsCount > 0) {
+          toast.success(`Found ${result.gamesCount} games you can play together with ${result.publicFriendsCount} friend${result.publicFriendsCount !== 1 ? 's' : ''}! Note: ${result.privateFriendsCount} friend${result.privateFriendsCount !== 1 ? 's have' : ' has'} private profiles and couldn't be included.`, {
+            duration: 6000
+          });
+        } else {
+          toast.success(`Found ${result.gamesCount} games you can play together with ${result.publicFriendsCount} friend${result.publicFriendsCount !== 1 ? 's' : ''}!`);
+        }
       } else {
-        toast.info('No common games found.');
-      }
-      
-      if (result.privateFriendsCount > 0 && result.publicFriendsCount > 0) {
-        toast.info(`Note: ${result.privateFriendsCount} friend${result.privateFriendsCount !== 1 ? 's have' : ' has'} private profiles and couldn't be included.`, {
-          duration: 5000
-        });
+        // No games found - consolidate messages based on scenarios
+        if (result.privateFriendsCount > 0 && result.publicFriendsCount === 0) {
+          toast.warning(`All ${result.privateFriendsCount} friend${result.privateFriendsCount !== 1 ? 's have' : ' has'} private Steam profiles. Ask them to make their game details public to find common games.`, {
+            duration: 6000
+          });
+        } else if (result.publicFriendsCount > 0 && result.privateFriendsCount > 0) {
+          toast.info(`No common games found with ${result.publicFriendsCount} public friend${result.publicFriendsCount !== 1 ? 's' : ''}. ${result.privateFriendsCount} friend${result.privateFriendsCount !== 1 ? 's have' : ' has'} private profiles and couldn't be included.`, {
+            duration: 6000
+          });
+        } else if (result.publicFriendsCount > 0) {
+          toast.info(`No common games found with ${result.publicFriendsCount} friend${result.publicFriendsCount !== 1 ? 's' : ''}.`, {
+            duration: 5000
+          });
+        } else {
+          toast.info('No common games found.', {
+            duration: 5000
+          });
+        }
       }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to find common games';
       toast.error(errorMessage);
+      setSearchPerformed(true);
     }
   };
 
@@ -162,8 +182,17 @@ export function PlayTogetherView() {
   const handleRemoveFriend = (steamId: string) => {
     const friendToRemove = friends.find(f => f.steamId === steamId);
     removeFriend(steamId);
+    setSearchPerformed(false); // Reset search state when friends are removed
     toast.success(`${friendToRemove?.name || 'Friend'} removed`);
     // Note: The FriendsContext automatically clears common games cache when friends are removed
+  };
+
+  // Handle removing all friends
+  const handleRemoveAllFriends = () => {
+    const friendCount = friends.length;
+    removeAllFriends(); // Use the context function that handles this in a single state update
+    setSearchPerformed(false); // Reset search state when all friends are removed
+    toast.success(`Removed all ${friendCount} friends from comparison list`);
   };
 
   const handleLaunchGame = (appId: number, gameName: string) => {
@@ -204,7 +233,7 @@ export function PlayTogetherView() {
                 <RefreshCw className="h-4 w-4 animate-spin" />
               ) : (
                 <>
-                  <UserPlus className="h-4 w-4 mr-2" />
+                  <UserPlus className="h-4 w-4" />
                   Add
                 </>
               )}
@@ -226,7 +255,7 @@ export function PlayTogetherView() {
             {isLoadingSteamFriends ? (
               <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
             ) : (
-              <ListRestart className="h-4 w-4 mr-2" />
+              <ListRestart className="h-4 w-4" />
             )}
             Load Friends from Steam
           </Button>
@@ -257,13 +286,24 @@ export function PlayTogetherView() {
                     variant="outline"
                     size="sm"
                   >
-                    {selectedSteamFriends.size === availableSteamFriends.length ? 'Unselect All' : 'Select All'}
+                    {selectedSteamFriends.size === availableSteamFriends.length ? (
+                      <>
+                        <X className="h-4 w-4" />
+                        Unselect All
+                      </>
+                    ) : (
+                      <>
+                        <Check className="h-4 w-4" />
+                        Select All
+                      </>
+                    )}
                   </Button>
                   <Button
                     onClick={handleAddSelectedFriends}
                     disabled={selectedSteamFriends.size === 0}
                     size="sm"
                   >
+                    <UserPlus className="h-4 w-4" />
                     Add Selected ({selectedSteamFriends.size})
                   </Button>
                 </div>
@@ -292,7 +332,17 @@ export function PlayTogetherView() {
                     variant="outline"
                     size="sm"
                   >
-                    {selectedSteamFriends.size === availableSteamFriends.length ? 'Unselect All' : 'Select All'}
+                    {selectedSteamFriends.size === availableSteamFriends.length ? (
+                      <>
+                        <X className="h-4 w-4 mr-2" />
+                        Unselect All
+                      </>
+                    ) : (
+                      <>
+                        <Check className="h-4 w-4 mr-2" />
+                        Select All
+                      </>
+                    )}
                   </Button>
                   <Button
                     onClick={handleAddSelectedFriends}
@@ -385,7 +435,7 @@ export function PlayTogetherView() {
         <Card>
           <CardHeader>
             <CardTitle className="space-y-2">
-              {/* Desktop layout - title with timestamp and button on same row */}
+              {/* Desktop layout - title with timestamp and buttons on same row */}
               <div className="hidden lg:flex lg:items-center lg:justify-between">
                 <div className="flex items-center gap-2">
                   <Users className="h-5 w-5" />
@@ -398,14 +448,23 @@ export function PlayTogetherView() {
                   )}
                 </div>
                 
-                <div>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleRemoveAllFriends}
+                    disabled={friends.length === 0}
+                    variant="destructive"
+                    size="sm"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Remove All
+                  </Button>
                   <Button
                     onClick={handleFindCommonGames}
                     disabled={isLoadingCommon || friends.length === 0}
                     variant="outline"
                     size="sm"
                   >
-                    <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingCommon ? 'animate-spin' : ''}`} />
+                    <RefreshCw className={`h-4 w-4 ${isLoadingCommon ? 'animate-spin' : ''}`} />
                     Find Common Games
                   </Button>
                 </div>
@@ -427,8 +486,8 @@ export function PlayTogetherView() {
                   </div>
                 )}
                 
-                {/* Row 3: Button */}
-                <div>
+                {/* Row 3: Buttons */}
+                <div className="flex gap-2">
                   <Button
                     onClick={handleFindCommonGames}
                     disabled={isLoadingCommon || friends.length === 0}
@@ -437,6 +496,15 @@ export function PlayTogetherView() {
                   >
                     <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingCommon ? 'animate-spin' : ''}`} />
                     Find Common Games
+                  </Button>
+                  <Button
+                    onClick={handleRemoveAllFriends}
+                    disabled={friends.length === 0}
+                    variant="destructive"
+                    size="sm"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Remove All
                   </Button>
                 </div>
               </div>
@@ -453,7 +521,7 @@ export function PlayTogetherView() {
           </CardHeader>
           
           <CardContent>
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-60 overflow-y-auto">
               {sortedFriends.map((friend) => {
                 const isPublic = publicFriends.includes(friend.steamId);
                 const isPrivate = privateFriends.includes(friend.steamId);
@@ -652,7 +720,9 @@ export function PlayTogetherView() {
               <p className="text-muted-foreground">
                 {friends.length === 0
                   ? "Add friends to find games you can play together"
-                  : `Click "Find Common Games" to see what you can play together`}
+                  : searchPerformed && commonGames.length === 0
+                    ? "No common games found."
+                    : `Click "Find Common Games" to see what you can play together`}
               </p>
             </div>
           )}

@@ -17,6 +17,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
           "--normal-border": "var(--border)",
         } as React.CSSProperties
       }
+      position="bottom-right"
+      expand={true}
+      visibleToasts={5}
+      closeButton={true}
+      duration={4000}
       {...props}
     />
   )

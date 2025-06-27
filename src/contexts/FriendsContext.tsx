@@ -45,6 +45,7 @@ interface FriendsContextType {
   addFriend: (steamId: string, name?: string) => Promise<void>;
   addSelectedSteamFriends: (steamIds: string[]) => void;
   removeFriend: (steamId: string) => void;
+  removeAllFriends: () => void;
   loadSteamFriends: () => Promise<number>;
   clearSteamFriends: () => void;
   findCommonGames: (friendsList?: Friend[]) => Promise<{ gamesCount: number; publicFriendsCount: number; privateFriendsCount: number; message: string }>;
@@ -224,6 +225,21 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
     const updatedFriends = friends.filter(f => f.steamId !== steamId);
     setFriends(updatedFriends);
     saveFriendsToCache(updatedFriends);
+    setLastFriendsUpdate(new Date());
+    
+    // Keep visibility data for removed friends so we remember their profile status
+    // when they appear in Steam friends selection later
+    
+    // Clear common games since they need to be recalculated
+    setCommonGames([]);
+    setCommonGamesLoaded(false);
+    setLastCommonGamesUpdate(null);
+    localStorage.removeItem(COMMON_GAMES_CACHE_KEY);
+  };
+
+  const removeAllFriends = () => {
+    setFriends([]);
+    saveFriendsToCache([]);
     setLastFriendsUpdate(new Date());
     
     // Keep visibility data for removed friends so we remember their profile status
@@ -462,6 +478,7 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
         addFriend,
         addSelectedSteamFriends,
         removeFriend,
+        removeAllFriends,
         loadSteamFriends,
         clearSteamFriends,
         findCommonGames,

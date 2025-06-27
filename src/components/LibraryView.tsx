@@ -476,7 +476,7 @@ export function LibraryView() {
                     variant="outline"
                     size="sm"
                   >
-                    <Users className="h-4 w-4 mr-2" />
+                    <Users className="h-4 w-4" />
                     View Other User
                   </Button>
                 )}
@@ -486,6 +486,7 @@ export function LibraryView() {
                   variant="outline"
                   size="sm"
                 >
+                  <ListRestart className="h-4 w-4" />
                   Reset View
                 </Button>
                 <Button
@@ -494,7 +495,7 @@ export function LibraryView() {
                   variant="outline"
                   size="sm"
                 >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                   Refresh
                 </Button>
               </div>
