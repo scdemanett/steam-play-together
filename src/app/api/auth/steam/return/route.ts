@@ -18,9 +18,6 @@ export async function GET(request: NextRequest) {
     // Authenticate the user with Steam
     const user = await steamAuth.authenticate(request);
     
-    // Debug: Log the user data to see what we're getting
-    console.log('Steam auth user data:', JSON.stringify(user, null, 2));
-    
     // Create the redirect URL with user data
     const redirectUrl = new URL('/', request.url);
     redirectUrl.searchParams.set('steam_auth_success', 'true');

@@ -1,64 +1,16 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
-import { SteamGame } from '@/lib/types';
+import { 
+  SteamGame, 
+  SortColumn, 
+  TableViewState, 
+  CachedGamesData, 
+  ViewingUser, 
+  GamesContextType 
+} from '@/lib/types';
 import { SteamAPI } from '@/lib/steam-api';
 import { useSettings } from '@/contexts/SettingsContext';
-
-export type SortColumn = 'name' | 'appid' | 'playtime' | 'playtime_windows' | 'playtime_mac' | 'playtime_linux' | 'playtime_deck' | 'last_played';
-
-interface TableViewState {
-  currentPage: number;
-  itemsPerPage: number;
-  sortBy: SortColumn;
-  sortOrder: 'asc' | 'desc';
-  searchTerm: string;
-}
-
-interface CachedGamesData {
-  games: SteamGame[];
-  gameCount: number;
-  timestamp: number;
-  steamId: string;
-  tableViewState: TableViewState;
-  userName?: string;
-}
-
-interface ViewingUser {
-  steamId: string;
-  name: string;
-  isOwnLibrary: boolean;
-}
-
-interface GamesContextType {
-  games: SteamGame[];
-  gameCount: number;
-  isLoading: boolean;
-  isLoaded: boolean;
-  error: string | null;
-  lastUpdated: Date | null;
-  viewingUser: ViewingUser | null;
-  profileVisibility: { steamId: string; isPublic: boolean } | null;
-  // Table view state
-  currentPage: number;
-  itemsPerPage: number;
-  sortBy: SortColumn;
-  sortOrder: 'asc' | 'desc';
-  searchTerm: string;
-  // Functions
-  loadLibrary: () => Promise<void>;
-  loadUserLibrary: (steamId: string, userName?: string) => Promise<void>;
-  resetToOwnLibrary: () => Promise<void>;
-  refreshLibrary: () => Promise<void>;
-  clearProfileVisibility: () => void;
-  clearCache: () => void;
-  setCurrentPage: (page: number) => void;
-  setItemsPerPage: (items: number) => void;
-  setSortBy: (column: SortColumn) => void;
-  setSortOrder: (order: 'asc' | 'desc') => void;
-  setSearchTerm: (term: string) => void;
-  resetTableView: () => void;
-}
 
 const GamesContext = createContext<GamesContextType | undefined>(undefined);
 

@@ -1,14 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { UserSettings } from '@/lib/types';
-
-interface SettingsContextType {
-  settings: UserSettings | null;
-  updateSettings: (newSettings: Partial<UserSettings>) => void;
-  clearSettings: () => void;
-  isConfigured: boolean;
-}
+import { UserSettings, SettingsContextType } from '@/lib/types';
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 

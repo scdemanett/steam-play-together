@@ -1,9 +1,4 @@
-interface SteamApiError {
-  message: string;
-  userMessage: string;
-  statusCode: number;
-  retryAfter?: number;
-}
+import { SteamApiError } from '@/lib/types';
 
 export function handleSteamApiError(error: unknown): SteamApiError {
   const errorObj = error as { response?: { status?: number; data?: unknown; headers?: Record<string, string> }; code?: string; message?: string };

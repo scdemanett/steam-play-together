@@ -1,58 +1,15 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
-import { SteamGame } from '@/lib/types';
+import { 
+  SteamGame, 
+  Friend, 
+  CachedFriendsData, 
+  CachedCommonGamesData, 
+  FriendsContextType 
+} from '@/lib/types';
 import { SteamAPI } from '@/lib/steam-api';
 import { useSettings } from '@/contexts/SettingsContext';
-
-interface Friend {
-  steamId: string;
-  name: string;
-  isPublic: boolean;
-  avatar?: string;
-}
-
-interface CachedFriendsData {
-  friends: Friend[];
-  timestamp: number;
-  steamId: string;
-}
-
-interface CachedCommonGamesData {
-  commonGames: SteamGame[];
-  friendIds: string[];
-  publicFriends: string[];
-  privateFriends: string[];
-  timestamp: number;
-  steamId: string;
-}
-
-interface FriendsContextType {
-  friends: Friend[];
-  steamFriends: Friend[];
-  commonGames: SteamGame[];
-  publicFriends: string[];
-  privateFriends: string[];
-  isLoadingFriends: boolean;
-  isLoadingSteamFriends: boolean;
-  isLoadingCommon: boolean;
-  friendsLoaded: boolean;
-  steamFriendsLoaded: boolean;
-  commonGamesLoaded: boolean;
-  lastFriendsUpdate: Date | null;
-  lastSteamFriendsUpdate: Date | null;
-  lastCommonGamesUpdate: Date | null;
-  addFriend: (steamId: string, name?: string) => Promise<void>;
-  addSelectedSteamFriends: (steamIds: string[]) => void;
-  removeFriend: (steamId: string) => void;
-  removeAllFriends: () => void;
-  loadSteamFriends: () => Promise<number>;
-  clearSteamFriends: () => void;
-  findCommonGames: (friendsList?: Friend[]) => Promise<{ gamesCount: number; publicFriendsCount: number; privateFriendsCount: number; message: string }>;
-  updateProfileVisibility: (steamId: string, isPublic: boolean) => void;
-  clearFriendsCache: () => void;
-  clearCommonGamesCache: () => void;
-}
 
 const FriendsContext = createContext<FriendsContextType | undefined>(undefined);
 

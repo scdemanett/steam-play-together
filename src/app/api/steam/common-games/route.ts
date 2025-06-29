@@ -1,18 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import { handleSteamApiError, logSteamApiError } from '@/lib/steam-api-errors';
-
-interface SteamGame {
-  appid: number;
-  name: string;
-  playtime_forever: number;
-  img_icon_url: string;
-  playtime_windows_forever: number;
-  playtime_mac_forever: number;
-  playtime_linux_forever: number;
-  playtime_deck_forever: number;
-  rtime_last_played: number;
-}
+import { SteamGame } from '@/lib/types';
 
 export async function POST(request: NextRequest) {
   try {

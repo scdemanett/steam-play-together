@@ -28,9 +28,6 @@ function AvatarDisplay({
 }) {
   if (!avatar) return null;
 
-  // Debug: Log avatar data to console
-  console.log('Avatar data:', avatar);
-
   let avatarSrc: string;
 
   // Handle both old string format and new object format for backwards compatibility

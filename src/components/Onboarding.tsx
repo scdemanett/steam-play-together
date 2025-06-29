@@ -11,13 +11,9 @@ import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHea
 import { CheckCircle, ExternalLink, Eye, EyeOff } from 'lucide-react';
 import { useSettings } from '@/contexts/SettingsContext';
 import { SteamAPI } from '@/lib/steam-api';
-import { UserSettings } from '@/lib/types';
+import { UserSettings, OnboardingProps } from '@/lib/types';
 import { toast } from 'sonner';
 import axios from 'axios';
-
-interface OnboardingProps {
-  onComplete: () => void;
-}
 
 export function Onboarding({ onComplete }: OnboardingProps) {
   const { updateSettings } = useSettings();
@@ -45,10 +41,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         let steamAvatar: UserSettings['steamAvatar'];
         try {
           steamAvatar = steamAvatarParam ? JSON.parse(steamAvatarParam) as UserSettings['steamAvatar'] : undefined;
-          console.log('Parsed steam avatar data:', steamAvatar);
         } catch (error) {
           console.error('Failed to parse avatar data:', error);
-          console.error('Raw avatar param was:', steamAvatarParam);
           steamAvatar = undefined;
         }
         
