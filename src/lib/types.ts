@@ -47,7 +47,19 @@ export interface UserSettings {
   steamApiKey: string;
   steamId: string;
   steamUsername?: string;
-  steamAvatar?: string;
+  steamAvatar?: string | {
+    small: string;
+    medium: string;
+    large: string;
+    animated?: {
+      static: string | null;
+      movie: string | null;
+    };
+    frame?: {
+      static: string | null;
+      movie: string | null;
+    };
+  };
   theme: 'light' | 'dark' | 'system';
 }
 

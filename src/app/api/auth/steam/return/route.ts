@@ -18,12 +18,16 @@ export async function GET(request: NextRequest) {
     // Authenticate the user with Steam
     const user = await steamAuth.authenticate(request);
     
+    // Debug: Log the user data to see what we're getting
+    console.log('Steam auth user data:', JSON.stringify(user, null, 2));
+    
     // Create the redirect URL with user data
     const redirectUrl = new URL('/', request.url);
     redirectUrl.searchParams.set('steam_auth_success', 'true');
     redirectUrl.searchParams.set('steam_id', user.steamid);
     redirectUrl.searchParams.set('steam_name', user.username);
-    redirectUrl.searchParams.set('steam_avatar', user.avatar.large);
+    // Pass the complete avatar data as JSON
+    redirectUrl.searchParams.set('steam_avatar', JSON.stringify(user.avatar));
     redirectUrl.searchParams.set('api_key', apiKey);
     
     // Clear the API key cookie

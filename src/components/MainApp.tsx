@@ -9,7 +9,51 @@ import { useSettings } from '@/contexts/SettingsContext';
 import { LibraryView } from '@/components/LibraryView';
 import { PlayTogetherView } from '@/components/PlayTogetherView';
 import { SettingsView } from '@/components/SettingsView';
+import { UserSettings } from '@/lib/types';
 import packageJson from '../../package.json';
+
+// Component for displaying Steam avatars with animated support
+function AvatarDisplay({ 
+  avatar, 
+  alt, 
+  width = 36, 
+  height = 36, 
+  className = "rounded-full" 
+}: { 
+  avatar: UserSettings['steamAvatar'];
+  alt: string;
+  width?: number;
+  height?: number;
+  className?: string;
+}) {
+  if (!avatar) return null;
+
+  // Debug: Log avatar data to console
+  console.log('Avatar data:', avatar);
+
+  let avatarSrc: string;
+
+  // Handle both old string format and new object format for backwards compatibility
+  if (typeof avatar === 'string') {
+    avatarSrc = avatar;
+  } else {
+    // Prefer animated avatar if available, fall back to static versions
+    avatarSrc = avatar.animated?.movie || avatar.large || avatar.medium || avatar.small;
+  }
+
+  if (!avatarSrc) return null;
+
+  return (
+    <Image
+      src={avatarSrc}
+      alt={alt}
+      width={width}
+      height={height}
+      className={className}
+      unoptimized
+    />
+  );
+}
 
 export function MainApp() {
   const { settings } = useSettings();
@@ -30,16 +74,10 @@ export function MainApp() {
               
               <div className="flex items-center justify-between lg:justify-end gap-3">
                 <div className="flex items-center gap-3">
-                  {settings?.steamAvatar && (
-                    <Image
-                      src={settings.steamAvatar}
-                      alt="Steam Avatar"
-                      width={32}
-                      height={32}
-                      className="rounded-full"
-                      unoptimized
-                    />
-                  )}
+                  <AvatarDisplay
+                    avatar={settings?.steamAvatar}
+                    alt="Steam Avatar"
+                  />
                   <div className="flex flex-col">
                     {settings?.steamUsername && (
                       <span className="text-sm font-medium">
@@ -97,16 +135,10 @@ export function MainApp() {
             
             <div className="flex items-center justify-between lg:justify-end gap-3">
               <div className="flex items-center gap-3">
-                {settings?.steamAvatar && (
-                  <Image
-                    src={settings.steamAvatar}
-                    alt="Steam Avatar"
-                    width={32}
-                    height={32}
-                    className="rounded-full"
-                    unoptimized
-                  />
-                )}
+                <AvatarDisplay
+                  avatar={settings?.steamAvatar}
+                  alt="Steam Avatar"
+                />
                 <div className="flex flex-col">
                   {settings?.steamUsername && (
                     <span className="text-sm font-medium">

@@ -10,6 +10,7 @@ export const createSteamAuth = (apiKey: string) => {
 };
 
 export interface SteamUser {
+  _json?: any;
   steamid: string;
   username: string;
   name: string;
@@ -17,8 +18,24 @@ export interface SteamUser {
     small: string;
     medium: string;
     large: string;
+    animated?: {
+      static: string | null;
+      movie: string | null;
+    };
+    frame?: {
+      static: string | null;
+      movie: string | null;
+    };
   };
   profile: {
     url: string;
+    background?: {
+      static: string | null;
+      movie: string | null;
+    };
+    background_mini?: {
+      static: string | null;
+      movie: string | null;
+    };
   };
 } 

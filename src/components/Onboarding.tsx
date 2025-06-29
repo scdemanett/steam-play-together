@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHea
 import { CheckCircle, ExternalLink, Eye, EyeOff } from 'lucide-react';
 import { useSettings } from '@/contexts/SettingsContext';
 import { SteamAPI } from '@/lib/steam-api';
+import { UserSettings } from '@/lib/types';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -36,16 +37,27 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     if (urlParams.get('steam_auth_success') === 'true') {
       const steamId = urlParams.get('steam_id');
       const steamName = urlParams.get('steam_name');
-      const steamAvatar = urlParams.get('steam_avatar');
+      const steamAvatarParam = urlParams.get('steam_avatar');
       const apiKeyFromUrl = urlParams.get('api_key');
       
       if (steamId && apiKeyFromUrl) {
+        // Parse avatar data from JSON
+        let steamAvatar: UserSettings['steamAvatar'];
+        try {
+          steamAvatar = steamAvatarParam ? JSON.parse(steamAvatarParam) as UserSettings['steamAvatar'] : undefined;
+          console.log('Parsed steam avatar data:', steamAvatar);
+        } catch (error) {
+          console.error('Failed to parse avatar data:', error);
+          console.error('Raw avatar param was:', steamAvatarParam);
+          steamAvatar = undefined;
+        }
+        
         // Complete setup with Steam data
         updateSettings({
           steamApiKey: apiKeyFromUrl,
           steamId: steamId,
           steamUsername: steamName || undefined,
-          steamAvatar: steamAvatar || undefined,
+          steamAvatar: steamAvatar,
         });
         
         toast.success(`Welcome ${steamName}! Your Steam account has been linked.`);
@@ -124,13 +136,20 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         
         // Fetch user's profile info (username and avatar)
         let steamUsername: string | undefined;
-        let steamAvatar: string | undefined;
+        let steamAvatar: UserSettings['steamAvatar'];
         
         try {
           const playerInfo = await SteamAPI.getPlayerSummaries([finalSteamId], apiKey);
           if (playerInfo.length > 0) {
             steamUsername = playerInfo[0].personaname;
-            steamAvatar = playerInfo[0].avatar;
+            // For now, create a basic avatar object from the single avatar URL
+            if (playerInfo[0].avatar) {
+              steamAvatar = {
+                small: playerInfo[0].avatar,
+                medium: playerInfo[0].avatar,
+                large: playerInfo[0].avatar,
+              };
+            }
           }
         } catch (error) {
           console.warn('Failed to fetch player info:', error);
