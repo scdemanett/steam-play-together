@@ -69,6 +69,7 @@ export function SettingsView() {
                 placeholder="Enter your Steam API key"
                 value={apiKeyInput}
                 onChange={(e) => setApiKeyInput(e.target.value)}
+                aria-describedby="apiKey-help"
               />
               <Button
                 type="button"
@@ -76,10 +77,14 @@ export function SettingsView() {
                 size="sm"
                 className="absolute right-2 top-1/2 -translate-y-1/2"
                 onClick={() => setShowApiKey(!showApiKey)}
+                aria-label={showApiKey ? "Hide API key" : "Show API key"}
               >
                 {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </Button>
             </div>
+            <p id="apiKey-help" className="text-sm text-muted-foreground">
+              Required to access Steam Web API. Get yours from <a href="https://steamcommunity.com/dev/apikey" target="_blank" rel="noopener noreferrer" className="hover:underline">steamcommunity.com/dev/apikey</a>
+            </p>
             {settings?.steamApiKey && (
               <p className="text-sm text-muted-foreground">
                 Current: {maskApiKey(settings.steamApiKey)}

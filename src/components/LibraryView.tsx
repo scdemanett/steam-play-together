@@ -656,7 +656,7 @@ export function LibraryView() {
                             setItemsPerPage(Number(value));
                           }}
                         >
-                          <SelectTrigger className="w-20 h-8">
+                          <SelectTrigger className="w-20 h-8" aria-label="Select number of items per page">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -675,6 +675,7 @@ export function LibraryView() {
                           size="sm"
                           onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                           disabled={currentPage === 1}
+                          aria-label="Go to previous page"
                         >
                           <ChevronLeft className="h-4 w-4" />
                         </Button>
@@ -711,6 +712,7 @@ export function LibraryView() {
                           size="sm"
                           onClick={() => setCurrentPage(Math.min(paginationData.totalPages, currentPage + 1))}
                           disabled={currentPage === paginationData.totalPages}
+                          aria-label="Go to next page"
                         >
                           <ChevronRight className="h-4 w-4" />
                         </Button>
@@ -728,18 +730,30 @@ export function LibraryView() {
                       <TableHead 
                         className="cursor-pointer hover:bg-muted/50"
                         onClick={() => handleSort('appid')}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSort('appid')}
+                        aria-label="Sort by App ID"
                       >
                         App ID {getSortIcon('appid')}
                       </TableHead>
                       <TableHead 
                         className="cursor-pointer hover:bg-muted/50"
                         onClick={() => handleSort('name')}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSort('name')}
+                        aria-label="Sort by game name"
                       >
                         Name {getSortIcon('name')}
                       </TableHead>
                       <TableHead 
                         className="cursor-pointer hover:bg-muted/50"
                         onClick={() => handleSort('playtime')}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSort('playtime')}
+                        aria-label="Sort by total playtime"
                       >
                         Total Playtime {getSortIcon('playtime')}
                       </TableHead>
@@ -748,30 +762,50 @@ export function LibraryView() {
                           <TableHead 
                             className="cursor-pointer hover:bg-muted/50"
                             onClick={() => handleSort('playtime_windows')}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSort('playtime_windows')}
+                            aria-label="Sort by Windows playtime"
                           >
                             Windows {getSortIcon('playtime_windows')}
                           </TableHead>
                           <TableHead 
                             className="cursor-pointer hover:bg-muted/50"
                             onClick={() => handleSort('playtime_mac')}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSort('playtime_mac')}
+                            aria-label="Sort by Mac playtime"
                           >
                             Mac {getSortIcon('playtime_mac')}
                           </TableHead>
                           <TableHead 
                             className="cursor-pointer hover:bg-muted/50"
                             onClick={() => handleSort('playtime_linux')}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSort('playtime_linux')}
+                            aria-label="Sort by Linux playtime"
                           >
                             Linux {getSortIcon('playtime_linux')}
                           </TableHead>
                           <TableHead 
                             className="cursor-pointer hover:bg-muted/50"
                             onClick={() => handleSort('playtime_deck')}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSort('playtime_deck')}
+                            aria-label="Sort by Steam Deck playtime"
                           >
                             Steam Deck {getSortIcon('playtime_deck')}
                           </TableHead>
                           <TableHead 
                             className="cursor-pointer hover:bg-muted/50"
                             onClick={() => handleSort('last_played')}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSort('last_played')}
+                            aria-label="Sort by last played date"
                           >
                             Last Played {getSortIcon('last_played')}
                           </TableHead>
@@ -831,7 +865,7 @@ export function LibraryView() {
                             setItemsPerPage(Number(value));
                           }}
                         >
-                          <SelectTrigger className="w-20 h-8">
+                          <SelectTrigger className="w-20 h-8" aria-label="Select number of items per page">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -850,6 +884,7 @@ export function LibraryView() {
                           size="sm"
                           onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                           disabled={currentPage === 1}
+                          aria-label="Go to previous page"
                         >
                           <ChevronLeft className="h-4 w-4" />
                         </Button>
@@ -886,6 +921,7 @@ export function LibraryView() {
                           size="sm"
                           onClick={() => setCurrentPage(Math.min(paginationData.totalPages, currentPage + 1))}
                           disabled={currentPage === paginationData.totalPages}
+                          aria-label="Go to next page"
                         >
                           <ChevronRight className="h-4 w-4" />
                         </Button>

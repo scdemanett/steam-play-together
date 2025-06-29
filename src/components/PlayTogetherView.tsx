@@ -565,6 +565,7 @@ export function PlayTogetherView() {
                         onClick={() => handleRemoveFriend(friend.steamId)}
                         variant="ghost"
                         size="sm"
+                        aria-label={`Remove ${friend.name} from friends list`}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

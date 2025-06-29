@@ -86,7 +86,12 @@ export function MainApp() {
                     </span>
                   </div>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => setShowSettings(false)}>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setShowSettings(false)}
+                  aria-label="Go back to main application"
+                >
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
               </div>
@@ -101,6 +106,7 @@ export function MainApp() {
               variant="outline" 
               onClick={() => setShowSettings(false)}
               className="flex items-center gap-2"
+              aria-label="Return to main application"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Main
@@ -147,7 +153,12 @@ export function MainApp() {
                   </span>
                 </div>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => setShowSettings(true)}>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setShowSettings(true)}
+                aria-label="Open settings"
+              >
                 <Settings className="h-4 w-4" />
               </Button>
             </div>

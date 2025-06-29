@@ -247,6 +247,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                       size="sm"
                       className="absolute right-2 top-1/2 -translate-y-1/2"
                       onClick={() => setShowApiKey(!showApiKey)}
+                      aria-label={showApiKey ? "Hide API key" : "Show API key"}
                     >
                       {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
@@ -298,7 +299,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                       >
                         <Image
                           src="/sign-in-through-steam_01.png"
-                          alt="Sign in through Steam"
+                          alt="Sign in through Steam - Official Steam authentication"
                           className="h-auto max-w-full"
                           width={180}
                           height={35}
