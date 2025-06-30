@@ -10,7 +10,7 @@ import { LibraryView } from '@/components/LibraryView';
 import { PlayTogetherView } from '@/components/PlayTogetherView';
 import { SettingsView } from '@/components/SettingsView';
 import { UserSettings } from '@/lib/types';
-import packageJson from '../../package.json';
+import { VersionDisplay } from '@/components/VersionDisplay';
 
 // Component for displaying Steam avatars with animated support
 function AvatarDisplay({ 
@@ -115,11 +115,7 @@ export function MainApp() {
           <SettingsView />
 
           {/* Version Display */}
-          <div className="mt-6 text-right">
-            <span className="text-xs text-muted-foreground">
-              v{packageJson.version}
-            </span>
-          </div>
+          <VersionDisplay />
         </main>
       </div>
     );
@@ -180,7 +176,7 @@ export function MainApp() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="library" className="space-y-6">
+          <TabsContent value="library" className="space-y-6 mb-0">
             <LibraryView />
           </TabsContent>
 
@@ -190,11 +186,7 @@ export function MainApp() {
         </Tabs>
 
         {/* Version Display */}
-        <div className="text-right">
-          <span className="text-xs text-muted-foreground">
-            v{packageJson.version}
-          </span>
-        </div>
+        <VersionDisplay />
       </main>
     </div>
   );
