@@ -9,7 +9,6 @@ export async function GET(request: NextRequest) {
 
     if (!apiKey) {
       // Check if this is a popup window
-      const userAgent = request.headers.get('user-agent') || '';
       const isPopup = request.url.includes('popup=true') || request.headers.get('sec-fetch-dest') === 'iframe';
       
       if (isPopup) {
