@@ -196,7 +196,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       <div className="w-full max-w-md">
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 flex items-center justify-center gap-2">
+            <span className="text-4xl -mt-2">🎮</span>
             Steam Play Together
           </h1>
           <p className="text-gray-600 dark:text-gray-300">
@@ -207,11 +208,10 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <span className="text-2xl">🎮</span>
               Setup Your Steam Connection
             </CardTitle>
             <CardDescription>
-              We need your Steam API key and Steam ID to get started
+              We need your Steam Web API key and Steam ID to get started
             </CardDescription>
             <Progress value={progress} className="mt-2" />
           </CardHeader>
@@ -221,7 +221,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
               <div className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <Label htmlFor="apiKey">Steam API Key</Label>
+                    <Label htmlFor="apiKey">Steam Web API Key</Label>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -236,7 +236,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                     <Input
                       id="apiKey"
                       type={showApiKey ? 'text' : 'password'}
-                      placeholder="Enter your Steam API key"
+                      placeholder="Enter your Steam Web API key"
                       value={apiKey}
                       onChange={(e) => setApiKey(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && validateApiKey()}
@@ -369,7 +369,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         <AlertDialog open={showInstructions} onOpenChange={setShowInstructions}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>How to Get Your Steam API Key</AlertDialogTitle>
+              <AlertDialogTitle>How to Get Your Steam Web API Key</AlertDialogTitle>
               <AlertDialogDescription asChild>
                 <div className="space-y-4">
                   <ol className="list-decimal list-inside space-y-2 text-sm">
@@ -386,7 +386,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                       onClick={() => window.open('https://steamcommunity.com/dev/apikey', '_blank')}
                     >
                       <ExternalLink className="h-4 w-4 mr-2" />
-                      Get API Key
+                      Get Web API Key
                     </Button>
                     <Button onClick={() => setShowInstructions(false)}>
                       Close
