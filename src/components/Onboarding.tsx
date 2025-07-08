@@ -193,14 +193,14 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   const progress = (step / 2) * 100;
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <div className="w-full max-w-lg">
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 flex items-center justify-center gap-2">
+          <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
             <span className="text-4xl -mt-2">🎮</span>
             Steam Play Together
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-muted-foreground">
             Find games to play with your friends
           </p>
         </div>
@@ -276,7 +276,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
             {step === 2 && (
               <div className="space-y-4">
-                <div className="flex items-center gap-2 text-green-600 dark:text-green-400 mb-4">
+                <div className="flex items-center gap-2 text-primary mb-4">
                   <CheckCircle className="h-5 w-5" />
                   <span className="font-medium">API Key Validated</span>
                 </div>
@@ -284,7 +284,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                 <div className="space-y-4">
                   <div className="text-center">
                     <h3 className="text-lg font-medium mb-2">Link Your Steam Account</h3>
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm text-muted-foreground mb-4">
                       Choose how you&apos;d like to connect your Steam account
                     </p>
                   </div>
@@ -306,15 +306,15 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                         />
                       </button>
                       {isSteamAuthenticating && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black rounded">
-                          <div className="flex items-center gap-2 text-white font-medium">
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <div className="absolute inset-0 flex items-center justify-center bg-card rounded">
+                          <div className="flex items-center gap-2 text-card-foreground font-medium">
+                            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                             Redirecting to Steam...
                           </div>
                         </div>
                       )}
                     </div>
-                    <p className="text-xs text-center text-gray-500">
+                    <p className="text-xs text-center text-muted-foreground">
                       Secure login through Steam - automatically gets your Steam ID
                     </p>
                   </div>
@@ -336,7 +336,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                         onChange={(e) => setSteamIdInput(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && validateSteamId()}
                       />
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="text-sm text-muted-foreground mt-1">
                         Enter your Steam ID (numbers) or Steam username
                       </p>
                     </div>
