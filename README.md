@@ -6,7 +6,7 @@ Steam Play Together is a modern web application that helps you discover which ga
 
 ## 🌐 Live Demo
 
-**[Try Steam Play Together Now →](https://steam-play-together.vercel.app/)**
+**[Try Steam Play Together Now →](https://steamplaytogether.com/)**
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
@@ -207,7 +207,7 @@ The app requires environment variables to function correctly in production, part
 
    **Other Platforms:**
    - Set `NEXT_PUBLIC_APP_URL` to your deployed URL
-   - Example: `https://steam-play-together.com`
+   - Example: `https://steamplaytogether.com`
 
 ### **Why This Is Required**
 
