@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSteamAuth } from '@/lib/steam-auth';
 import { redirect } from 'next/navigation';
+import SteamAuth from 'node-steam-openid';
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,8 +9,9 @@ export async function GET(request: NextRequest) {
     const apiKey = request.cookies.get('steam_api_key')?.value;
 
     if (!apiKey) {
-      // Check if this is a popup window
-      const isPopup = request.url.includes('popup=true') || request.headers.get('sec-fetch-dest') === 'iframe';
+      // Check if this is a popup window (from URL parameter)
+      const url = new URL(request.url);
+      const isPopup = url.searchParams.get('popup') === 'true';
       
       if (isPopup) {
         // Return HTML that sends message to parent window
@@ -41,14 +43,22 @@ export async function GET(request: NextRequest) {
       return redirect('/?error=steam_auth_expired');
     }
 
-    // Create Steam auth instance with the stored API key
-    const steamAuth = createSteamAuth(apiKey);
+    // Check if this is a popup window (from URL parameter)
+    const url = new URL(request.url);
+    const isPopup = url.searchParams.get('popup') === 'true';
+    
+    // Create Steam auth instance with the correct return URL
+    const baseReturnUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/auth/steam/return`;
+    const returnUrl = isPopup ? `${baseReturnUrl}?popup=true` : baseReturnUrl;
+    
+    const steamAuth = new SteamAuth({
+      realm: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      returnUrl: returnUrl,
+      apiKey: apiKey,
+    });
     
     // Authenticate the user with Steam
     const user = await steamAuth.authenticate(request);
-    
-    // Check if this is a popup window
-    const isPopup = request.url.includes('popup=true') || request.headers.get('sec-fetch-dest') === 'iframe';
     
     if (isPopup) {
       // Return HTML that sends success message to parent window
@@ -109,8 +119,9 @@ export async function GET(request: NextRequest) {
     const errorObj = error as { message?: string };
     console.error('Steam auth callback error:', errorObj.message);
     
-    // Check if this is a popup window
-    const isPopup = request.url.includes('popup=true') || request.headers.get('sec-fetch-dest') === 'iframe';
+    // Check if this is a popup window (from URL parameter)
+    const url = new URL(request.url);
+    const isPopup = url.searchParams.get('popup') === 'true';
     
     if (isPopup) {
       // Return HTML that sends error message to parent window
