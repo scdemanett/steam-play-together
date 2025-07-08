@@ -26,7 +26,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   const [showApiKey, setShowApiKey] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
 
-  // Handle Steam authentication callback
+  // Handle Steam authentication callback (fallback for non-popup mode)
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     
@@ -177,11 +177,76 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
     setIsSteamAuthenticating(true);
     try {
-      const response = await axios.post('/api/auth/steam', { apiKey: apiKey.trim() });
+      const response = await axios.post('/api/auth/steam', { 
+        apiKey: apiKey.trim(),
+        popup: true 
+      });
       
       if (response.data.redirectUrl) {
-        // Redirect to Steam for authentication
-        window.location.href = response.data.redirectUrl;
+        // Open Steam auth in a popup window
+        const popup = window.open(
+          response.data.redirectUrl,
+          'steam-auth',
+          'width=800,height=600,scrollbars=yes,resizable=yes,status=yes,location=yes,toolbar=no,menubar=no'
+        );
+
+        if (!popup) {
+          toast.error('Popup blocked. Please allow popups for this site and try again.');
+          setIsSteamAuthenticating(false);
+          return;
+        }
+
+        // Listen for messages from the popup
+        const handleMessage = (event: MessageEvent) => {
+          // Verify origin for security
+          if (event.origin !== window.location.origin) {
+            return;
+          }
+
+          if (event.data.type === 'STEAM_AUTH_SUCCESS') {
+            const { steamId, steamName, steamAvatar, apiKey: returnedApiKey } = event.data;
+            
+            // Complete setup with Steam data
+            updateSettings({
+              steamApiKey: returnedApiKey,
+              steamId: steamId,
+              steamUsername: steamName || undefined,
+              steamAvatar: steamAvatar,
+            });
+            
+            toast.success(`Welcome ${steamName}! Your Steam account has been linked.`);
+            onComplete();
+            
+            // Cleanup
+            window.removeEventListener('message', handleMessage);
+            popup.close();
+          } else if (event.data.type === 'STEAM_AUTH_ERROR') {
+            const error = event.data.error;
+            if (error === 'steam_auth_expired') {
+              toast.error('Steam authentication expired. Please try again.');
+            } else if (error === 'steam_auth_failed') {
+              toast.error('Steam authentication failed. Please try again.');
+            } else {
+              toast.error('Authentication failed. Please try again.');
+            }
+            
+            // Cleanup
+            window.removeEventListener('message', handleMessage);
+            popup.close();
+            setIsSteamAuthenticating(false);
+          }
+        };
+
+        window.addEventListener('message', handleMessage);
+
+        // Check if popup was closed without completing auth
+        const checkClosed = setInterval(() => {
+          if (popup.closed) {
+            clearInterval(checkClosed);
+            window.removeEventListener('message', handleMessage);
+            setIsSteamAuthenticating(false);
+          }
+        }, 1000);
       }
     } catch (error) {
       console.error('Steam auth error:', error);
@@ -309,7 +374,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                         <div className="absolute inset-0 flex items-center justify-center bg-card rounded">
                           <div className="flex items-center gap-2 text-card-foreground font-medium">
                             <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                            Redirecting to Steam...
+                            Opening Steam login...
                           </div>
                         </div>
                       )}

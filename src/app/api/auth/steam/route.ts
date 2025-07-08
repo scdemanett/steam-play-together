@@ -3,7 +3,7 @@ import { createSteamAuth } from '@/lib/steam-auth';
 
 export async function POST(request: NextRequest) {
   try {
-    const { apiKey } = await request.json();
+    const { apiKey, popup } = await request.json();
 
     if (!apiKey) {
       return NextResponse.json({ error: 'Steam API key is required' }, { status: 400 });
@@ -13,7 +13,14 @@ export async function POST(request: NextRequest) {
     const steamAuth = createSteamAuth(apiKey);
     
     // Get the redirect URL to Steam
-    const redirectUrl = await steamAuth.getRedirectUrl();
+    let redirectUrl = await steamAuth.getRedirectUrl();
+    
+    // Add popup indicator if requested
+    if (popup) {
+      const url = new URL(redirectUrl);
+      url.searchParams.set('popup', 'true');
+      redirectUrl = url.toString();
+    }
     
     // Store the API key in a cookie for the return callback
     const response = NextResponse.json({ redirectUrl });
