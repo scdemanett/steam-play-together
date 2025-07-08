@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSteamAuth } from '@/lib/steam-auth';
 import { redirect } from 'next/navigation';
-import SteamAuth from 'node-steam-openid';
 
 export async function GET(request: NextRequest) {
   try {
@@ -47,15 +46,8 @@ export async function GET(request: NextRequest) {
     const url = new URL(request.url);
     const isPopup = url.searchParams.get('popup') === 'true';
     
-    // Create Steam auth instance with the correct return URL
-    const baseReturnUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/auth/steam/return`;
-    const returnUrl = isPopup ? `${baseReturnUrl}?popup=true` : baseReturnUrl;
-    
-    const steamAuth = new SteamAuth({
-      realm: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-      returnUrl: returnUrl,
-      apiKey: apiKey,
-    });
+    // Create Steam auth instance with the API key and popup flag
+    const steamAuth = createSteamAuth(apiKey, isPopup);
     
     // Authenticate the user with Steam
     const user = await steamAuth.authenticate(request);
