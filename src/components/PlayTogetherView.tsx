@@ -40,7 +40,7 @@ export function PlayTogetherView() {
   } = useFriends();
   
   const [filteredGames, setFilteredGames] = useState<SteamGame[]>([]);
-  const [searchTerm, setSearchTerm] = useLocalStorage('play-together-search', '', settings?.steamId);
+  const [searchTerm, setSearchTerm] = useState('');
   const [newFriendInput, setNewFriendInput] = useState('');
   const [searchPerformed, setSearchPerformed] = useState(false);
   const [selectedSteamFriendsArray, setSelectedSteamFriendsArray] = useLocalStorage<string[]>('play-together-selected', [], settings?.steamId);
@@ -362,7 +362,7 @@ export function PlayTogetherView() {
           </CardHeader>
           
           <CardContent>
-            <div className="space-y-2 max-h-60 overflow-y-auto">
+            <div className="space-y-2 max-h-80 overflow-y-auto">
               {availableSteamFriends.map((friend) => {
                 const isPublic = publicFriends.includes(friend.steamId);
                 const isPrivate = privateFriends.includes(friend.steamId);
@@ -521,7 +521,7 @@ export function PlayTogetherView() {
           </CardHeader>
           
           <CardContent>
-            <div className="space-y-2 max-h-60 overflow-y-auto">
+            <div className="space-y-2 max-h-80 overflow-y-auto">
               {sortedFriends.map((friend) => {
                 const isPublic = publicFriends.includes(friend.steamId);
                 const isPrivate = privateFriends.includes(friend.steamId);

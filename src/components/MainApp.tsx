@@ -180,7 +180,7 @@ export function MainApp() {
             <LibraryView />
           </TabsContent>
 
-          <TabsContent value="play-together" className="space-y-6">
+          <TabsContent value="play-together" className="space-y-6" forceMount>
             <PlayTogetherView />
           </TabsContent>
         </Tabs>
